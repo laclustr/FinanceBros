@@ -25,4 +25,4 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - [ ] Export data (CSV or PDF)  
 - [ ] Clean UI/UX design with accessibility in mind  
 - [ ] Submission materials prepared for Congressional App Challenge  
-- [ ] Dark mode and theme toggling  
+- [ ] Dark mode and theme toggling
