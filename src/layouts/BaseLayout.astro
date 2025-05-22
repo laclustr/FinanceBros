@@ -1,3 +1,11 @@
+---
+import Analytics from '@vercel/analytics/astro'
+import SpeedInsights  from "@vercel/speed-insights/astro"
+
+import Navigation from "../components/Navigation.astro"
+import GlobalStyling from "../styles/global.css"
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
@@ -8,15 +16,9 @@
 		<title>Astro Basics</title>
 	</head>
 	<body>
+		<SpeedInsights/>
+		<Analytics/>
+		<Navigation />
 		<slot />
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
