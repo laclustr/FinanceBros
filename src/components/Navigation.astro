@@ -1,14 +1,17 @@
 ---
-import "../styles/global.css"
-import "../styles/NavStyling.css"
+import "../global.css"
 ---
-<nav>
-  <div class="nav-container">
-    <a href="/" id="logo">Finance Bros</a>
-    <div class="nav-links">
-      <a href="/about/">About</a>
-      <a href="/login/sign-up">Register</a>
-      <a href="/login/sign-in">Login</a>
+<header class="fixed top-0 left-0 w-full bg-white shadow z-50">
+  <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex-shrink-0 text-xl font-bold text-gray-800">
+        <a href="/">Finance Bros</a>
+      </div>
+      <div class="hidden md:flex space-x-4">
+        <a href="/about" class="text-gray-700 hover:text-blue-500">About</a>
+        <a href="/login/sign-up" class="text-gray-700 hover:text-blue-500">Sign Up</a>
+        <a href="/login/sign-in" class="text-gray-700 hover:text-blue-500">Login</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+</header>
