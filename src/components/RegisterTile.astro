@@ -1,7 +1,7 @@
 ---
 ---
 
-<div class="flex items-start justify-center h-screen bg-blue-50 pt-24">
+<div class="flex items-start justify-center h-screen bg-blue-50 pt-50">
   <form id="registerForm" class="flex flex-col gap-4 p-8 rounded-xl bg-white shadow-lg w-full max-w-md">
     <h1 class="text-2xl font-bold text-center">Register</h1>
     <input formnovalidate id="email" type="text" placeholder="Email" class="border-2 border-gray-300 rounded-md p-2" required />
@@ -9,19 +9,22 @@
     <button id="submitBtn" type="submit" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 active:bg-blue-800 transition">
       Register
     </button>
+    <p id="errorMessage" class="text-red-500 text-sm"></p>
   </form>
 </div>
 
 <script>
   const form = document.getElementById('registerForm');
   const submitBtn = document.getElementById('submitBtn');
+  const errorMessage = document.getElementById('errorMessage');
 
-  if (form && submitBtn) {
+  if (form && submitBtn && errorMessage) {
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       submitBtn.disabled = true;
       submitBtn.textContent = 'Registering...';
+      errorMessage.textContent = '';
 
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
@@ -37,10 +40,20 @@
           body: JSON.stringify({ email, password }),
         });
 
+        if (!res.ok) {
+          throw new Error(`Server error: ${res.status} ${res.statusText}`);
+        }
+
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await res.text();
+          throw new Error(`Unexpected response format: ${text}`);
+        }
+
         const data = await res.json();
-        alert(data.message || 'Something went wrong.');
+        alert(data.message || 'Registration successful!');
       } catch (error) {
-        alert('Network error, please try again.');
+        errorMessage.textContent = `Network error, please try again. ${error.message}`;
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Register';
