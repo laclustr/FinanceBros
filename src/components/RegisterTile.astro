@@ -1,13 +1,29 @@
 ---
+const {
+  type,
+} = Astro.props;
+let apiPath;
+let title;
+if (type === "register") {
+  apiPath = "/api/register";
+  title = "Register";
+} else if (type === "login") {
+  apiPath = "/api/login";
+  title = "Login";
+} else {
+  apiPath = "/api/register";
+  title = "Register";
+}
+
 ---
 
 <div class="flex items-start justify-center h-screen bg-blue-50 pt-50">
   <form id="registerForm" class="flex flex-col gap-4 p-8 rounded-xl bg-white shadow-lg w-full max-w-md">
-    <h1 class="text-2xl font-bold text-center">Register</h1>
+    <h1 class="text-2xl font-bold text-center">{title}</h1>
     <input formnovalidate id="email" type="text" placeholder="Email" class="border-2 border-gray-300 rounded-md p-2" required />
     <input formnovalidate id="password" type="password" placeholder="Password" class="border-2 border-gray-300 rounded-md p-2" required />
     <button id="submitBtn" type="submit" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 active:bg-blue-800 transition">
-      Register
+      {title}
     </button>
     <p id="errorMessage" class="text-red-500 text-sm"></p>
   </form>
@@ -17,6 +33,7 @@
   const form = document.getElementById('registerForm');
   const submitBtn = document.getElementById('submitBtn');
   const errorMessage = document.getElementById('errorMessage');
+  const apiPath = "${apiPath}"
 
   if (form && submitBtn && errorMessage) {
     form.addEventListener('submit', async (e) => {
@@ -34,7 +51,7 @@
       const password = passwordInput.value;
 
       try {
-        const res = await fetch('/api/register', {
+        const res = await fetch(apiPath, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password }),

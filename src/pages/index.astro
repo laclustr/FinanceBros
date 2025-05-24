@@ -1,5 +1,26 @@
 ---
 import Layout from '../layouts/BaseLayout.astro';
+import GenericTile from '../components/GenericTile.astro';
 ---
 <Layout>
-</Layout>
+    <div class="bg-blue-50">
+      <main class="pt-20" />
+      
+      <div class="flex flex-col">
+        <div class="h-screen p-4">
+          <GenericTile 
+            title="A Budgeting Tool for the Modern Age"
+            description="Built for the modern age, Finance Bros is a budgeting tool that helps you manage your finances.\n "
+            imgSrc="../../public/Main-Menu-1.jpg"
+          />
+        </div>
+        <div class="h-screen p-4">
+          <GenericTile 
+            title=""
+            description="More finance tools await you"
+            icon="https://www.svgrepo.com/show/452096/money.svg"
+          />
+        </div>
+      </div>
+    </div>
+  </Layout>
