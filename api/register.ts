@@ -3,45 +3,21 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-export async function POST(req: Request): Promise<Response> {
+export async function POST(req) {
   try {
     const { email, password } = await req.json();
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ error: 'Email and password required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-      },
-    });
+    await prisma.user.create({ data: { email, password: hashedPassword } });
 
-    console.log('Registered user:', email);
-
-    return new Response(JSON.stringify({ message: 'Registered successfully!' }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    return new Response(JSON.stringify({ message: 'Registered successfully!' }), { status: 200 });
   } catch (error) {
-    console.error('Error registering user:', error);
-
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    console.error(error);
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
   }
-}
-
-export async function GET(): Promise<Response> {
-  return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-    status: 405,
-    headers: { 'Content-Type': 'application/json' },
-  });
 }
