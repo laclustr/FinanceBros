@@ -1,23 +1,48 @@
+import type { APIRoute } from 'astro';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+export const prisma =
+  globalForPrisma.prisma ||
+  new PrismaClient();
 
-export async function POST(req: Request) {
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const { email, password } = await req.json();
+    const { email, password } = await request.json();
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: 'Email and password required' }),
+        { status: 400 }
+      );
+    }
+
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({ error: 'User already exists' }),
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({ data: { email, password: hashedPassword } });
+    await prisma.user.create({
+      data: { email, password: hashedPassword },
+    });
 
-    return new Response(JSON.stringify({ message: 'Registered successfully!' }), { status: 200 });
+    return new Response(
+      JSON.stringify({ message: 'Registered successfully!' }),
+      { status: 200 }
+    );
   } catch (error) {
-    console.error(error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+    console.error('[REGISTER ERROR]', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500 }
+    );
   }
-}
+};
