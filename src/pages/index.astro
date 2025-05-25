@@ -1,25 +1,28 @@
 ---
 import Layout from '../layouts/BaseLayout.astro';
 import GenericTile from '../components/GenericTile.astro';
-import MM1 from '../assets/Main-Menu-1.jpg';
+import MM1 from '../assets/MainMenu/Main-Menu-1.jpg';
+import MM2 from '../assets/MainMenu/Main-Menu-2.jpg';
+export const prerender = true;
 ---
 <Layout>
     <div class="bg-blue-50">
       <main class="pt-20" />
       
       <div class="flex flex-col">
-        <div class="h-screen p-4">
+        <div class="p-4 pb-0">
           <GenericTile 
             title="A Budgeting Tool for the Modern Age"
             description="Built for the modern age, Finance Bros is a budgeting tool that helps you manage your finances.\n "
             img={MM1}
           />
         </div>
-        <div class="h-screen p-4">
+        <div class="p-4">
           <GenericTile 
-            title=""
-            description="More finance tools await you"
-            icon="https://www.svgrepo.com/show/452096/money.svg"
+            title="Made by bros for bros"
+            description="Handles your finances with ease"
+            img={MM2}
+            imgAlign="right"
           />
         </div>
       </div>
