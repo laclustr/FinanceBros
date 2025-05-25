@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/BaseLayout.astro';
 import GenericTile from '../components/GenericTile.astro';
+import MM1 from '../assets/Main-Menu-1.jpg';
 ---
 <Layout>
     <div class="bg-blue-50">
@@ -11,7 +12,7 @@ import GenericTile from '../components/GenericTile.astro';
           <GenericTile 
             title="A Budgeting Tool for the Modern Age"
             description="Built for the modern age, Finance Bros is a budgeting tool that helps you manage your finances.\n "
-            imgSrc="../assets/Main-Menu-1.jpg"
+            imgSrc={MM1.src}
           />
         </div>
         <div class="h-screen p-4">
