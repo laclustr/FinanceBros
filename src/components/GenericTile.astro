@@ -1,20 +1,33 @@
 ---
+import { Image } from 'astro:assets';
+
 const {
   title,
   description,
   imgAlign = "left",
-  imgSrc = "",
+  img = null,
+  alt = '',
+  imageWidth = 300,
+  imageHeight = 300,
+  imageClass = "rounded-xl max-w-full h-auto",
 } = Astro.props;
 ---
 
-<div class="flex items-center gap-4 w-full h-screen bg-[#000435] border-2 rounded-xl border-gray-200 shadow-md hover:shadow-lg transition-all p-0">
-  {imgSrc && (
-    <div class="text-3xl text-blue-600 dark:text-blue-400 pl-45">
-      <img src={imgSrc} alt="" class="max-w-128 max-h-128 rounded-xl" />
+<div class={`flex ${imgAlign === 'right' ? 'flex-row-reverse' : 'flex-row'} items-center gap-6 w-full h-screen bg-[#000435] border-2 rounded-xl border-gray-200 shadow-md hover:shadow-lg transition-all pl-48`}>
+  {img && (
+    <div class="flex-shrink-0">
+      <Image 
+        src={img} 
+        alt={alt} 
+        width={imageWidth} 
+        height={imageHeight} 
+        class={imageClass} 
+        loading="lazy"
+      />
     </div>
   )}
-  <div>
-    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">{description}</p>
+  <div class="flex flex-col pl-24">
+    <h3 class="text-2xl font-semibold text-white dark:text-white">{title}</h3>
+    <p class="text-base text-gray-300 dark:text-gray-300 mt-2">{description}</p>
   </div>
 </div>
