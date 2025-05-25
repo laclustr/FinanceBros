@@ -10,6 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@astrojs/vercel": "^8.1.4",
     "@prisma/client": "^6.8.2",
     "@tailwindcss/vite": "^4.1.7",
     "@vercel/analytics": "^1.5.0",
