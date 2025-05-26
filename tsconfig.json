@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
@@ -10,10 +10,10 @@
     "strict": true,
     "jsx": "preserve",
     "allowJs": true,
-    "checkJs": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist"
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
