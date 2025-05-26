@@ -1,71 +1,115 @@
 ---
-const {
-  type,
-} = Astro.props;
-let apiPath;
-let title;
-if (type === "register") {
-  apiPath = "/api/register";
-  title = "Register";
-} else {
-  apiPath = "/api/login";
-  title = "Login";
-}
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/starwind/card";
+import { Input } from "@/components/starwind/input";
+import { Label } from "@/components/starwind/label";
+import { Button } from "@/components/starwind/button";
 
+const { type } = Astro.props;
+const apiPath = type === "register" ? "/api/register" : "/api/login";
+const title = type === "register" ? "Register" : "Login";
 ---
 
-<div class="flex items-start justify-center h-screen bg-blue-50 pt-50">
-  <form data-message={apiPath} id="registerForm" class="flex flex-col gap-4 p-8 rounded-xl bg-white shadow-lg w-full max-w-md">
-    <h1 class="text-2xl font-bold text-center">{title}</h1>
-    <input formnovalidate id="email" type="text" placeholder="Email" class="border-2 border-gray-300 rounded-md p-2" required />
-    <input formnovalidate id="password" type="password" placeholder="Password" class="border-2 border-gray-300 rounded-md p-2" required />
-    <button id="submitBtn" type="submit" class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 active:bg-blue-800 transition">
-      {title}
-    </button>
-    <p id="errorMessage" class="text-red-500 text-sm"></p>
-  </form>
+<div class="flex items-center justify-center min-h-screen bg-blue-50 p-4">
+  <Card class="w-full max-w-md">
+    <CardHeader>
+      <CardTitle class="text-center">{title}</CardTitle>
+    </CardHeader>
+    <form id="authForm" data-api={apiPath} novalidate>
+      <CardContent class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <Label for="email">Email</Label>
+          <Input id="email" type="email" placeholder="Enter your email" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <Label for="password">Password</Label>
+          <Input id="password" type="password" placeholder="Enter your password" />
+        </div>
+        <p id="errorMessage" class="text-red-500 text-sm"></p>
+      </CardContent>
+      <CardFooter>
+        <Button id="submitBtn" type="submit" class="w-full">{title}</Button>
+      </CardFooter>
+    </form>
+  </Card>
 </div>
 
 <script>
-  const apiPath = document.getElementById('registerForm').getAttribute('data-message');
-  const form = document.getElementById('registerForm');
+  const form = document.getElementById('authForm');
   const submitBtn = document.getElementById('submitBtn');
   const errorMessage = document.getElementById('errorMessage');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
 
-  if (form && submitBtn && errorMessage) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Registering...';
-      errorMessage.textContent = '';
-
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      if (!emailInput || !passwordInput) return;
-
-      const email = emailInput.value;
-      const password = passwordInput.value;
-
-      try {
-        const res = await fetch(apiPath, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (!res.ok) {
-          throw new Error(`Server error: ${res.status} ${res.statusText}`);
-        }
-
-        const data = await res.json();
-        alert(data.message || 'Registration successful!');
-      } catch (error) {
-        errorMessage.textContent = `Network error, please try again. ${error.message}`;
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Register';
-      }
-    });
+  function validateEmail(email) {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
   }
+
+  function validatePassword(password) {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    return passwordRegex.test(password);
+  }
+
+  function clearError() {
+    errorMessage.textContent = '';
+  }
+
+  // Listen for input changes to clear the error message
+  [emailInput, passwordInput].forEach(input => {
+    input.addEventListener('input', clearError);
+  });
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    const apiPath = form.getAttribute('data-api');
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // Validation
+    if (!email) {
+      errorMessage.textContent = 'Please enter your email address.';
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      errorMessage.textContent = 'Please enter a valid email address.';
+      return;
+    }
+
+    if (!password) {
+      errorMessage.textContent = 'Please enter your password.';
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      errorMessage.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, and a number.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = `${apiPath.includes('register') ? 'Registering' : 'Logging in'}...`;
+    errorMessage.textContent = '';
+
+    try {
+      const res = await fetch(apiPath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      alert(data.message || `${apiPath.includes('register') ? 'Registered' : 'Logged in'} successfully!`);
+    } catch (error) {
+      errorMessage.textContent = `Error: ${error.message}`;
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = apiPath.includes('register') ? 'Register' : 'Login';
+    }
+  }
+
+  form.addEventListener('submit', handleSubmit);
 </script>
