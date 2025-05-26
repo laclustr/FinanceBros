@@ -2,16 +2,52 @@
 import "../global.css"
 ---
 <header class="fixed top-4 left-1/2 transform -translate-x-1/2 w-[98%] z-50">
-  <nav class="bg-gray-200/90 backdrop-blur shadow-md rounded-[0.8rem] px-6 py-3">
+  <nav class="bg-gray-200/90 backdrop-blur shadow-md rounded-[0.8rem] px-4 sm:px-6 py-3">
     <div class="flex items-center justify-between max-w-8xl mx-auto">
       <div class="flex-shrink-0 text-lg font-bold text-gray-800">
         <a href="/">Finance Bros</a>
       </div>
+      
+      <!-- Desktop Navigation -->
       <div class="hidden md:flex space-x-4">
         <a href="/about" class="text-gray-700 hover:text-blue-500">About</a>
         <a href="/login/sign-up" class="text-gray-700 hover:text-blue-500">Sign Up</a>
         <a href="/login/sign-in" class="text-gray-700 hover:text-blue-500">Login</a>
       </div>
+      
+      <!-- Mobile Menu Button -->
+      <button class="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-500 hover:bg-gray-300/50" id="mobile-menu-button" aria-label="Toggle menu">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Mobile Navigation -->
+    <div class="md:hidden mt-3 pt-3 border-t border-gray-300/50 hidden" id="mobile-menu">
+      <div class="space-y-2">
+        <a href="/about" class="block px-2 py-2 text-gray-700 hover:text-blue-500 hover:bg-gray-300/30 rounded-md">About</a>
+        <a href="/login/sign-up" class="block px-2 py-2 text-gray-700 hover:text-blue-500 hover:bg-gray-300/30 rounded-md">Sign Up</a>
+        <a href="/login/sign-in" class="block px-2 py-2 text-gray-700 hover:text-blue-500 hover:bg-gray-300/30 rounded-md">Login</a>
+      </div>
     </div>
   </nav>
 </header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    
+    menuButton.addEventListener('click', function() {
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      if (!menuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+  });
+</script>
