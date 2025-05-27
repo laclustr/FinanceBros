@@ -1,9 +1,10 @@
 {
-  "name": "",
+  "name": "astro-vercel-app",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "vercel-dev": "prisma generate && vercel dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
