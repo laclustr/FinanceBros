@@ -13,20 +13,20 @@ export const POST: APIRoute = async (request) => {
   try {
     const { email, password } = await request.json();
 
-    // if (!email || !password) {
-    //   return new Response(
-    //     JSON.stringify({ error: 'Email and password required' }),
-    //     { status: 400 }
-    //   );
-    // }
+    if (!email || !password) {
+      return new Response(
+        JSON.stringify({ error: 'Email and password required' }),
+        { status: 400 }
+      );
+    }
 
-    // const existingUser = await prisma.user.findUnique({ where: { email } });
-    // if (existingUser) {
-    //   return new Response(
-    //     JSON.stringify({ error: 'User already exists' }),
-    //     { status: 409 }
-    //   );
-    // }
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return new Response(
+        JSON.stringify({ error: 'User already exists' }),
+        { status: 409 }
+      );
+    }
 
     // const hashedPassword = await bcrypt.hash(password, 10);
 
