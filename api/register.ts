@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../src/generated/prisma/index.js';
 import bcrypt from 'bcryptjs';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
