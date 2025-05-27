@@ -1,3 +1,35 @@
 ---
-export const prerender = true;
+export const prerender = false;
 ---
+
+<html>
+  <head><title>Dashboard</title></head>
+  <body>
+    <h1>Welcome, <span id="username"></span>!</h1>
+    <form action="/api/logout" method="POST">
+      <button type="submit">Logout</button>
+    </form>
+  </body>
+</html>
+
+<script>
+async function fetchUser() {
+    const res = await fetch('/api/verify-token', {method: 'GET'});
+    if (!res.ok) {
+        return null;
+    }
+    const data = await res.json();
+    if (data.success) {
+        return data.user;
+    } else {
+        return null;
+    }
+}
+
+let user = await fetchUser();
+if (!user) {
+    window.location.href = '/login/sign-in';
+} else {
+    document.getElementById('username').textContent = user.email;
+}
+</script>

@@ -22,66 +22,60 @@ if (!JWT_SECRET) {
     throw new Error("Missing JWT_SECRET environment variable");
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
     try {
-        const { email, password } = await request.json();
-
-        if (!email || !password) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    error: 'Both email and password are required.',
-                    email: !!email,
-                    password: !!password,
-                }),
-                { status: 400 }
-            );
-        }
-
-        const normalizedEmail = normalizeEmail(email);
-
-        const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
-        if (!existingUser) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    error: 'User does not exist.',
-                    emailExists: false,
-                }),
-                { status: 404 }
-            );
-        }
-
-        const passwordMatches = await bcrypt.compare(password, existingUser.password);
-        if (!passwordMatches) {
-            return new Response(
-                JSON.stringify({
-                    success: false,
-                    error: 'Invalid password.',
-                }),
-                { status: 401 }
-            );
-        }
-
-        const token = jwt.sign(
-            {
-                userId: existingUser.id,
-                email: existingUser.email,
-            },
-            JWT_SECRET,
-            { expiresIn: '1d' }
-        );
-
+      const { email, password } = await request.json();
+  
+      if (!email || !password) {
         return new Response(
-            JSON.stringify({
-                success: true,
-                message: 'Logged in successfully!',
-                token,
-            }),
-            { status: 200 }
+          JSON.stringify({ success: false, error: 'Both email and password are required.' }),
+          { status: 400 }
         );
+      }
+  
+      const normalizedEmail = normalizeEmail(email);
+      const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
+  
+      if (!existingUser) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'User does not exist.' }),
+          { status: 404 }
+        );
+      }
+  
+      const passwordMatches = await bcrypt.compare(password, existingUser.password);
+      if (!passwordMatches) {
+        return new Response(
+          JSON.stringify({ success: false, error: 'Invalid password.' }),
+          { status: 401 }
+        );
+      }
+  
+      const token = jwt.sign(
+        { userId: existingUser.id, email: existingUser.email },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+  
+      const isProduction = process.env.NODE_ENV === 'production';
+  
+      cookies.set('token', token, {
+        httpOnly: true,
+        secure: isProduction,
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+  
+      return new Response(
+        JSON.stringify({ success: true, message: 'Logged in successfully!' }),
+        { status: 200 }
+      );
     } catch (error) {
-        console.error('Login error:', error);
-        return new Response(JSON.stringify({ success: false, error: 'Internal server error' }), { status: 500 });
+      console.error('Login error:', error);
+      return new Response(
+        JSON.stringify({ success: false, error: 'Internal server error' }),
+        { status: 500 }
+      );
     }
-};
+  };
+  

@@ -58,25 +58,6 @@ const title = type === "register" ? "Register" : "Login";
     input.addEventListener('input', clearError);
   });
 
-  async function loginUser(email, password) {
-    const loginRes = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
-
-    if (!loginRes.ok) {
-      throw new Error('Login failed after registration.');
-    }
-
-    const loginData = await loginRes.json();
-    if (!loginData.success) {
-      throw new Error(loginData.error || 'Login failed.');
-    }
-
-    localStorage.setItem('token', loginData.token);
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
     const apiPath = form.getAttribute('data-api');
@@ -120,15 +101,8 @@ const title = type === "register" ? "Register" : "Login";
       }
 
       const data = await res.json();
-
       if (!data.success) {
         throw new Error(data.error || 'Authentication failed.');
-      }
-
-      if (apiPath.includes('register')) {
-        await loginUser(email, password);
-      } else {
-        localStorage.setItem('token', data.token);
       }
 
       window.location.href = '/dashboard';
