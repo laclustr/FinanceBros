@@ -15,7 +15,12 @@ export const POST: APIRoute = async (request) => {
 
     if (!email || !password) {
       return new Response(
-        JSON.stringify({ error: 'Email and password required' }),
+        JSON.stringify({
+          success: false,
+          error: 'Both email and password are required.',
+          email: !!email,
+          password: !!password,
+        }),
         { status: 400 }
       );
     }
@@ -23,7 +28,11 @@ export const POST: APIRoute = async (request) => {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return new Response(
-        JSON.stringify({ error: 'User already exists' }),
+        JSON.stringify({
+          success: false,
+          error: 'A user with that email already exists.',
+          emailExists: true
+        }),
         { status: 409 }
       );
     }
@@ -35,7 +44,11 @@ export const POST: APIRoute = async (request) => {
     });
 
     return new Response(
-      JSON.stringify({ message: 'Registered successfully!' }),
+      JSON.stringify({
+        success: true,
+        message: 'Registered successfully!',
+        email
+      }),
       { status: 200 }
     );
   } catch (error) {
