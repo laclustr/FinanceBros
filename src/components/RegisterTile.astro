@@ -65,27 +65,27 @@ const title = type === "register" ? "Register" : "Login";
     const password = passwordInput.value.trim();
 
     if (!email) {
-      errorMessage.textContent = 'Please enter your email address.';
+      errorMessage.textContent = 'Please enter your email address';
       return;
     }
 
     if (!validateEmail(email)) {
-      errorMessage.textContent = 'Please enter a valid email address.';
+      errorMessage.textContent = 'Please enter a valid email address';
       return;
     }
 
     if (!password) {
-      errorMessage.textContent = 'Please enter your password.';
+      errorMessage.textContent = 'Please enter your password';
       return;
     }
 
-    if (!validatePassword(password)) {
-      errorMessage.textContent = 'Password must be at least 8 characters, include uppercase, lowercase, and a number.';
+    if (!validatePassword(password) && apiPath.includes('register')) {
+      errorMessage.textContent = 'Password must be at least 8 characters long and include uppercase, lowercase, and a number';
       return;
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = `${apiPath.includes('register') ? 'Registering' : 'Logging in'}...`;
+    submitBtn.textContent = apiPath.includes('register') ? 'Registering...' : 'Logging in...';
     errorMessage.textContent = '';
 
     try {
@@ -96,22 +96,30 @@ const title = type === "register" ? "Register" : "Login";
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Server error: ${res.status} - ${errorText}`);
+        const data = await res.json().catch(() => null);
+        if (data && data.error) {
+          throw new Error(data.error);
+        }
+        throw new Error('An unexpected error occurred, please try again');
       }
 
       const data = await res.json();
       if (!data.success) {
-        throw new Error(data.error || 'Authentication failed.');
+        throw new Error(data.error || 'Authentication failed, please try again.');
       }
 
-      window.location.href = '/dashboard';
+      submitBtn.textContent = 'Success! Redirecting...';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1500);
 
     } catch (error) {
-      errorMessage.textContent = `Error: ${error.message}`;
+      errorMessage.textContent = error.message;
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = apiPath.includes('register') ? 'Register' : 'Login';
+      if (!submitBtn.textContent.includes('Redirecting')) {
+        submitBtn.textContent = apiPath.includes('register') ? 'Register' : 'Login';
+      }
     }
   }
 

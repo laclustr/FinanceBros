@@ -28,7 +28,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   
       if (!email || !password) {
         return new Response(
-          JSON.stringify({ success: false, error: 'Both email and password are required.' }),
+          JSON.stringify({ success: false, error: 'Both email and password are required' }),
           { status: 400 }
         );
       }
@@ -38,7 +38,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   
       if (!existingUser) {
         return new Response(
-          JSON.stringify({ success: false, error: 'User does not exist.' }),
+          JSON.stringify({ success: false, error: 'User does not exist' }),
           { status: 404 }
         );
       }
@@ -46,7 +46,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       const passwordMatches = await bcrypt.compare(password, existingUser.password);
       if (!passwordMatches) {
         return new Response(
-          JSON.stringify({ success: false, error: 'Invalid password.' }),
+          JSON.stringify({ success: false, error: 'Invalid password' }),
           { status: 401 }
         );
       }
@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     } catch (error) {
       console.error('Login error:', error);
       return new Response(
-        JSON.stringify({ success: false, error: 'Internal server error' }),
+        JSON.stringify({ success: false, error: 'Oops! Something went wrong on our end. Please try again later.' }),
         { status: 500 }
       );
     }
