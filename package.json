@@ -22,6 +22,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "astro": "^5.7.14",
     "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
     "tailwind-variants": "^1.0.0",
     "tw-animate-css": "^1.3.0"
   },
