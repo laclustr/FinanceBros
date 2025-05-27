@@ -3,7 +3,8 @@ import { PrismaClient } from '../src/generated/prisma/index.js';
 import bcrypt from 'bcryptjs';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-export const prisma = globalForPrisma.prisma || new PrismaClient();
+export const prisma =
+  globalForPrisma.prisma || new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
@@ -13,16 +14,6 @@ function normalizeEmail(email: string): string {
 
   const cleanedLocal = localPart.split('+')[0].replace(/\./g, '');
   return `${cleanedLocal}@${domain}`;
-}
-
-function validateEmail(email: string): boolean {
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  return emailRegex.test(email);
-}
-
-function validatePassword(password: string): boolean {
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return passwordRegex.test(password);
 }
 
 export const POST: APIRoute = async (request) => {
@@ -43,33 +34,13 @@ export const POST: APIRoute = async (request) => {
 
     const normalizedEmail = normalizeEmail(email);
 
-    if (!validateEmail(normalizedEmail)) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Invalid email format.',
-        }),
-        { status: 400 }
-      );
-    }
-
-    if (!validatePassword(password)) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, and one number.',
-        }),
-        { status: 400 }
-      );
-    }
-
     const existingUser = await prisma.user.findUnique({ where: { email: normalizedEmail } });
     if (existingUser) {
       return new Response(
         JSON.stringify({
           success: false,
           error: 'A user with that email already exists.',
-          emailExists: true,
+          emailExists: true
         }),
         { status: 409 }
       );
@@ -91,6 +62,11 @@ export const POST: APIRoute = async (request) => {
     );
   } catch (error) {
     console.error('[REGISTER ERROR]', error);
+
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
 
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
