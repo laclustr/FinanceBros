@@ -1,10 +1,9 @@
 import { APIRoute } from 'astro';
-import { PrismaClient } from '../../generated/prisma/index.js';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-export const prisma =
-  globalForPrisma.prisma || new PrismaClient();
+export const prisma = globalForPrisma.prisma || new PrismaClient();
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
@@ -16,7 +15,7 @@ function normalizeEmail(email: string): string {
   return `${cleanedLocal}@${domain}`;
 }
 
-export const POST: APIRoute = async (request) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const { email, password } = await request.json();
 
@@ -40,7 +39,7 @@ export const POST: APIRoute = async (request) => {
         JSON.stringify({
           success: false,
           error: 'A user with that email already exists.',
-          emailExists: true
+          emailExists: true,
         }),
         { status: 409 }
       );
