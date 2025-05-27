@@ -97,13 +97,11 @@ const title = type === "register" ? "Register" : "Login";
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok || !data.success) {
-        errorMessage.textContent = data.error || `Error: ${res.status}`;
-        return;
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
       }
 
+      const data = await res.json();
       alert(data.message || `${apiPath.includes('register') ? 'Registered' : 'Logged in'} successfully!`);
     } catch (error) {
       errorMessage.textContent = `Error: ${error.message}`;
