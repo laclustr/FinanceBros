@@ -58,6 +58,33 @@ const title = type === "register" ? "Register" : "Login";
     input.addEventListener('input', clearError);
   });
 
+  async function loginUser(email, password) {
+    submitBtn.textContent = 'Logging in...';
+    try {
+      const loginRes = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!loginRes.ok) {
+        const loginData = await loginRes.json().catch(() => null);
+        throw new Error((loginData && loginData.error) || 'Login failed after registration.');
+      }
+      const loginData = await loginRes.json();
+      if (!loginData.success) {
+        throw new Error(loginData.error || 'Login failed after registration.');
+      }
+      submitBtn.textContent = 'Success! Redirecting...';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1500);
+    } catch (error) {
+      errorMessage.textContent = error.message;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Register'; // fallback
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
     const apiPath = form.getAttribute('data-api');
@@ -108,18 +135,19 @@ const title = type === "register" ? "Register" : "Login";
         throw new Error(data.error || 'Authentication failed, please try again.');
       }
 
-      submitBtn.textContent = 'Success! Redirecting...';
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1500);
+      if (apiPath.includes('register')) {
+        await loginUser(email, password);
+      } else {
+        submitBtn.textContent = 'Success! Redirecting...';
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1500);
+      }
 
     } catch (error) {
       errorMessage.textContent = error.message;
-    } finally {
       submitBtn.disabled = false;
-      if (!submitBtn.textContent.includes('Redirecting')) {
-        submitBtn.textContent = apiPath.includes('register') ? 'Register' : 'Login';
-      }
+      submitBtn.textContent = apiPath.includes('register') ? 'Register' : 'Login';
     }
   }
 

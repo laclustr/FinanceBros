@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Both email and password are required.',
+          error: 'Both email and password are required',
           email: !!email,
           password: !!password,
         }),
@@ -38,7 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'A user with that email already exists.',
+          error: 'A user with that email already exists',
           emailExists: true,
         }),
         { status: 409 }
