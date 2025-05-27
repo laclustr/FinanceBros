@@ -9,17 +9,23 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async (request) => {
   try {
     const { email, password } = await request.json();
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ error: 'Email and password required' }), { status: 400 });
+      return new Response(
+        JSON.stringify({ error: 'Email and password required' }),
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return new Response(JSON.stringify({ error: 'User already exists' }), { status: 409 });
+      return new Response(
+        JSON.stringify({ error: 'User already exists' }),
+        { status: 409 }
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,7 +34,10 @@ export const POST: APIRoute = async ({ request }) => {
       data: { email, password: hashedPassword },
     });
 
-    return new Response(JSON.stringify({ message: 'Registered successfully!' }), { status: 200 });
+    return new Response(
+      JSON.stringify({ message: 'Registered successfully!' }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error('[REGISTER ERROR]', error);
 
@@ -37,6 +46,9 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('Error stack:', error.stack);
     }
 
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500 });
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500 }
+    );
   }
 };
