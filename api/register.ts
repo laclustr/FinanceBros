@@ -28,7 +28,7 @@ export const POST: APIRoute = async (request) => {
       );
     }
 
-    // const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     // await prisma.user.create({
     //   data: { email, password: hashedPassword },
