@@ -1,0 +1,42 @@
+---
+export const prerender = false;
+import { verifyToken } from '../api/verify-token';
+import Layout from '../../layouts/DashboardLayout.astro';
+import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
+
+import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@/components/starwind/dropdown";
+import { Button } from "@/components/starwind/button";
+import DropdownTriangle from '@tabler/icons/filled/triangle-inverted.svg';
+
+const { cookies, redirect } = Astro;
+const token = cookies.get('token')?.value;
+
+const user = await verifyToken(token);
+
+if (!user) {
+  return redirect('/login/sign-in');
+}
+---
+
+<Layout title="New">
+  <div class="flex min-h-screen p-10 bg-blue-50 relative">
+    <div class="relative">
+      <Dropdown>
+        <DropdownTrigger asChild>
+          <Button class="flex items-center gap-1 text-base font-normal">
+            New
+            <DropdownTriangle class="max-w-2.5 max-h-2.5 inline align-middle" />
+          </Button>
+        </DropdownTrigger>
+        <DropdownContent class="absolute left-0 top-full mt-2 bg-white shadow-md border z-50">
+          <DropdownItem as="div">Purchase</DropdownItem>
+          <DropdownItem as="div">Goal</DropdownItem>
+          <DropdownItem as="div">Investment</DropdownItem>
+        </DropdownContent>
+      </Dropdown>
+    </div>
+  </div>  
+
+  <DashboardNav />
+</Layout>
+

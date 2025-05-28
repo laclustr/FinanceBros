@@ -1,0 +1,59 @@
+<footer class="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[95%] z-50">
+  <nav class="bg-gray-200/90 backdrop-blur shadow-md rounded-xl px-3 py-2">
+    <div class="flex justify-around items-center text-gray-700">
+      
+      <a href="/dashboard/new" class="group flex flex-col items-center hover:text-blue-500">
+        <div class="p-1 rounded-full transition-all duration-200">
+          <img src="/src/assets/dashboard/icons/Plus-Icon.svg" alt="New" class="w-5 h-5">
+        </div>
+        <span class="text-xs mt-0.5 hidden sm:block">New</span>
+      </a>
+      
+      <a href="/dashboard" class="group flex flex-col items-center hover:text-blue-500">
+        <div class="p-1 rounded-full transition-all duration-200">
+          <img src="/src/assets/dashboard/icons/Home-Icon.svg" alt="Home" class="w-5 h-5">
+        </div>
+        <span class="text-xs mt-0.5 hidden sm:block">Home</span>
+      </a>
+      
+      <a href="/dashboard/purchases" class="group flex flex-col items-center hover:text-blue-500">
+        <div class="p-1 rounded-full transition-all duration-200">
+          <img src="/src/assets/dashboard/icons/Purchases-Icon.svg" alt="Purchases" class="w-5 h-5">
+        </div>
+        <span class="text-xs mt-0.5 hidden sm:block">Purchases</span>
+      </a>
+      
+      <a href="/dashboard/investments" class="group flex flex-col items-center hover:text-blue-500">
+        <div class="p-1 rounded-full transition-all duration-200">
+          <img src="/src/assets/dashboard/icons/Investments-Icon.svg" alt="Investments" class="w-5 h-5">
+        </div>
+        <span class="text-xs mt-0.5 hidden sm:block">Investments</span>
+      </a>
+      
+      <a href="/dashboard/account" class="group flex flex-col items-center hover:text-blue-500">
+        <div class="p-1 rounded-full transition-all duration-200">
+          <img src="/src/assets/dashboard/icons/Account-Icon.svg" alt="Account" class="w-5 h-5">
+        </div>
+        <span class="text-xs mt-0.5 hidden sm:block">Account</span>
+      </a>
+      
+    </div>
+  </nav>
+</footer>
+
+<script>
+  const links = document.querySelectorAll('footer a');
+  const currentPath = window.location.pathname;
+  
+  links.forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      const iconWrapper = link.querySelector('div');
+      iconWrapper.classList.add(
+        'bg-blue-300/20',
+        'backdrop-blur-sm',
+        'shadow-md',
+        'ring-0'
+      );
+    }
+  });
+</script>

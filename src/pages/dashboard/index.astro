@@ -1,5 +1,8 @@
 ---
+export const prerender = false;
 import { verifyToken } from '../api/verify-token';
+import Layout from '../../layouts/DashboardLayout.astro';
+import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -11,12 +14,9 @@ if (!user) {
 }
 ---
 
-<html>
-  <head><title>Dashboard</title></head>
-  <body>
-    <h1>Welcome, {user.email}!</h1>
-    <form action="/api/logout" method="POST">
-      <button type="submit">Logout</button>
-    </form>
-  </body>
-</html>
+<Layout>
+  <div class="flex flex-col items-left pt-3 p-5">
+    <h1 class="">Welcome, {user.email}!</h1>
+  </div>
+  <DashboardNav />
+</Layout>
