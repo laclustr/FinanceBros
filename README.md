@@ -30,6 +30,7 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 ## Get Started
 ```
 npm install
-.env << DATABASE_URL= \ JWT_SECRET= // Include Secrets after '='
+echo .env >> DATABASE_URL=
+  JWT_SECRET=
 npm run dev
 ```
