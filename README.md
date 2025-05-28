@@ -26,3 +26,10 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - [ ] Clean UI/UX design with accessibility in mind  
 - [ ] Submission materials prepared for Congressional App Challenge  
 - [ ] Dark mode and theme toggling
+
+## Get Started
+```
+npm install
+.env << DATABASE_URL= \ JWT_SECRET= // Include Secrets after '='
+npm run dev
+```
