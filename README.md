@@ -19,12 +19,10 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - [ ] Dashboard for tracking expenses and income  
 - [ ] Interactive charts and graphs (e.g., pie chart, bar graph)  
 - [ ] Responsive mobile and desktop design  
-- [ ] Local storage and/or backend data persistence  
+- [x] Local storage and/or backend data persistence  
 - [ ] Monthly budget planning and tracking tools  
 - [ ] Categorization of transactions  
-- [ ] Export data (CSV or PDF)  
-- [ ] Clean UI/UX design with accessibility in mind  
-- [ ] Submission materials prepared for Congressional App Challenge  
+- [ ] Clean UI/UX design with accessibility in mind   
 - [ ] Dark mode and theme toggling
 
 ## Get Started
