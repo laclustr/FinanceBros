@@ -15,7 +15,7 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - Personalized alerts for overspending or upcoming payments
 
 ## Checklist
-- [ ] User authentication and account creation  
+- [x] User authentication and account creation  
 - [ ] Dashboard for tracking expenses and income  
 - [ ] Interactive charts and graphs (e.g., pie chart, bar graph)  
 - [ ] Responsive mobile and desktop design  
