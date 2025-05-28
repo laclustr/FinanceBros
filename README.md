@@ -25,6 +25,9 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - [ ] Clean UI/UX design with accessibility in mind   
 - [ ] Dark mode and theme toggling
 
+## Dependencies
+- [Node.js](https://nodejs.org/en/download)
+
 ## Get Started
 ```
 npm install
