@@ -29,9 +29,19 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 - [Node.js](https://nodejs.org/en/download)
 
 ## Get Started
+- Install Chocolatey (Windows Only)
+- Install Node.js (20.x.x for best compatibility)
+- Run the Following Command:
 ```
 npm install
-echo .env >> DATABASE_URL=
-  JWT_SECRET=
+```
+- Locate a Serverless Postgres Database (Neon Recommended)
+- Create a .env file with the Following:
+```
+DATABASE_URL=  // Should be in the format: "postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]"
+JWT_SECRET=  // Random string of alphanumeric characters; the longer the better
+```
+- Finally, run this Command to Access the Website
+```
 npm run dev
 ```
