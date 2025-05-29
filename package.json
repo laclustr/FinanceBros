@@ -20,7 +20,6 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/sdk": "^1.7.7",
     "@vercel/speed-insights": "^1.2.0",
-    "@vite-pwa/astro": "^1.1.0",
     "astro": "^5.7.14",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
@@ -31,10 +30,14 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@vercel/node": "^5.1.16",
+    "@vite-pwa/astro": "^1.1.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
     "prisma": "^6.8.2",
     "tailwindcss": "^4.1.7",
-    "vitest": "^3.1.4"
+    "vite-plugin-pwa": "^1.0.0",
+    "vitest": "^3.1.4",
+    "workbox-build": "^7.3.0",
+    "workbox-cli": "^7.3.0"
   }
 }
