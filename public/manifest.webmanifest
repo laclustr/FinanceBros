@@ -1,7 +1,7 @@
 {
     "name": "Finance Bros",
     "short_name": "FinanceBros",
-    "start_url": "/",
+    "start_url": "/dashboard",
     "id": "/",
     "display": "standalone",
     "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],

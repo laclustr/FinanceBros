@@ -23,6 +23,7 @@
     "astro": "^5.7.14",
     "bcryptjs": "^3.0.2",
     "jsonwebtoken": "^9.0.2",
+    "sib-api-v3-sdk": "^8.5.0",
     "tailwind-variants": "^1.0.0",
     "tw-animate-css": "^1.3.0"
   },
