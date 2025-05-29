@@ -1,9 +1,9 @@
 module.exports = {
-	globDirectory: 'dist/',
+	globDirectory: 'public/',
 	globPatterns: [
-	  '**/*.{html,js,css,svg,jpg,png,json,woff2}'
+	  '**/*.{html,js,css,svg,jpg,png,json,woff2,webmanifest}'
 	],
-	swDest: 'dist/sw.js',
+	swDest: 'public/sw.js',
 	ignoreURLParametersMatching: [
 	  /^utm_/,
 	  /^fbclid$/
@@ -18,10 +18,17 @@ module.exports = {
 		  cacheName: 'pages-cache',
 		  networkTimeoutSeconds: 3,
 		  expiration: { maxEntries: 50 },
+		  plugins: [
+			{
+			  handlerDidError: async () => {
+				return caches.match('/offline.html');
+			  }
+			}
+		  ]
 		},
 	  },
 	  {
-		urlPattern: ({ request }) => request.destination === 'style' || request.destination === 'script',
+		urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
 		handler: 'StaleWhileRevalidate',
 		options: { cacheName: 'assets-cache' },
 	  },
@@ -35,4 +42,3 @@ module.exports = {
 	  },
 	],
   };
-  
