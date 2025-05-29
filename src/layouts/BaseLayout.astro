@@ -18,16 +18,16 @@ import "../global.css"
 		<title>Finance Bros</title>
 	</head>
 	<body>
-		<SpeedInsights/>
-		<Analytics/>
-		<Navigation />
-		<slot />
 		<script>
 			if ('serviceWorker' in navigator) {
 			  navigator.serviceWorker.register('/sw.js')
 				.then(() => console.log('Service Worker registered'))
 				.catch(console.error);
 			}
-		  </script>		  
+		</script>
+		<SpeedInsights/>
+		<Analytics/>
+		<Navigation />
+		<slot />	  
 	</body>
 </html>

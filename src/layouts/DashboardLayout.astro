@@ -21,15 +21,15 @@ const {
 		<title>Finance Bros - {title}</title>
 	</head>
 	<body>
-		<SpeedInsights/>
-		<Analytics/>
-		<slot />
 		<script>
 			if ('serviceWorker' in navigator) {
 			  navigator.serviceWorker.register('/sw.js')
 				.then(() => console.log('Service Worker registered'))
 				.catch(console.error);
 			}
-		  </script>
+		</script>	
+		<SpeedInsights/>
+		<Analytics/>
+		<slot />
 	</body>
 </html>

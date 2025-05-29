@@ -1,22 +1,48 @@
 {
     "name": "Finance Bros",
-    "short_name": "Finance Bros",
-    "description": "Your personal finance companion, built for the future.",
+    "short_name": "FinanceBros",
     "start_url": "/",
+    "id": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#3367D6",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+    "background_color": "#ff22ff",
+    "theme_color": "#ff00ff",
     "icons": [
       {
-        "src": "/icons/manifest-icon-192.maskable.png",
+        "src": "/icons/icon-192x192.png",
         "sizes": "192x192",
-        "type": "image/png"
+        "type": "image/png",
+        "purpose": "any"
       },
       {
-        "src": "/icons/manifest-icon-512.maskable.png",
+        "src": "/icons/icon-512x512.png",
         "sizes": "512x512",
-        "type": "image/png"
+        "type": "image/png",
+        "purpose": "any"
       }
+    ],
+    "screenshots": [
+      {
+        "src": "/screenshots/homepage.png",
+        "sizes": "3360x1822",
+        "type": "image/png",
+        "form_factor": "wide",
+        "label": "Homepage"
+      },
+      {
+        "src": "/screenshots/mobile.png",
+        "sizes": "716x1562",
+        "type": "image/png",
+        "form_factor": "narrow",
+        "label": "Mobile View"
+      }
+    ],
+    "protocol_handlers": [
+    {
+        "protocol": "web+financebros",
+        "url": "/?url=%s"
+    }
     ]
+
   }
   
