@@ -12,28 +12,21 @@ module.exports = {
 	skipWaiting: true,
 	runtimeCaching: [
 	  {
-		urlPattern: ({ request }) => request.mode === 'navigate',
+		urlPattern: ({request}) => request.mode === 'navigate',
 		handler: 'NetworkFirst',
 		options: {
 		  cacheName: 'pages-cache',
 		  networkTimeoutSeconds: 3,
 		  expiration: { maxEntries: 50 },
-		  plugins: [
-			{
-			  handlerDidError: async () => {
-				return caches.match('/offline.html');
-			  }
-			}
-		  ]
 		},
 	  },
 	  {
-		urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
+		urlPattern: ({request}) => request.destination === 'script' || request.destination === 'style',
 		handler: 'StaleWhileRevalidate',
 		options: { cacheName: 'assets-cache' },
 	  },
 	  {
-		urlPattern: ({ request }) => request.destination === 'image',
+		urlPattern: ({request}) => request.destination === 'image',
 		handler: 'CacheFirst',
 		options: {
 		  cacheName: 'images-cache',
@@ -42,3 +35,4 @@ module.exports = {
 	  },
 	],
   };
+  
