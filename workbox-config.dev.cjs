@@ -1,38 +1,10 @@
 module.exports = {
-	globDirectory: 'public/',
-	globPatterns: [
-	  '**/*.{html,js,css,svg,jpg,png,json,woff2,webmanifest}'
-	],
-	swDest: 'public/sw.js',
-	ignoreURLParametersMatching: [
-	  /^utm_/,
-	  /^fbclid$/
-	],
-	clientsClaim: true,
-	skipWaiting: true,
-	runtimeCaching: [
-	  {
-		urlPattern: ({request}) => request.mode === 'navigate',
-		handler: 'NetworkFirst',
-		options: {
-		  cacheName: 'pages-cache',
-		  networkTimeoutSeconds: 3,
-		  expiration: { maxEntries: 50 },
-		},
-	  },
-	  {
-		urlPattern: ({request}) => request.destination === 'script' || request.destination === 'style',
-		handler: 'StaleWhileRevalidate',
-		options: { cacheName: 'assets-cache' },
-	  },
-	  {
-		urlPattern: ({request}) => request.destination === 'image',
-		handler: 'CacheFirst',
-		options: {
-		  cacheName: 'images-cache',
-		  expiration: { maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 },
-		},
-	  },
-	],
+    globDirectory: 'src/',
+    globPatterns: [
+      '**/*.{html,js,css,json,ico,png,jpg,svg,woff2,woff,ttf,webmanifest}'
+    ],
+    swDest: 'public/sw.js',
+    swSrc: 'src/sw-base.js',
+    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
   };
   

@@ -1,5 +1,6 @@
 # build output
 dist/
+sw.js
 
 # generated types
 .astro/
