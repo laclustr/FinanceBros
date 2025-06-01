@@ -1,14 +1,9 @@
-const path = require('path');
-
 module.exports = {
-  globDirectory: path.join(__dirname, 'dist'),
+  globDirectory: '/',
   globPatterns: [
     '**/*.*'
   ],
-  globIgnores: [
-    'sw.js'
-  ],
-  swDest: path.join(__dirname, 'about', 'sw.js'),
-  swSrc: path.join(__dirname, 'public', 'sw-base.js'),
-  maximumFileSizeToCacheInBytes: 50 * 1024 * 1024
+  swDest: '/sw.js',
+  swSrc: 'public/sw-base.js',
+  maximumFileSizeToCacheInBytes: 100 * 1024 * 1024
 };
