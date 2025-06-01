@@ -1,7 +1,7 @@
 {
     "name": "Finance Bros",
     "short_name": "Finance Bros",
-    "start_url": "/dashboard",
+    "start_url": "/",
     "display": "standalone",
     "theme_color": "#ff00ff",
     "background_color": "#ff22ff",

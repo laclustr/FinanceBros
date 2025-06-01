@@ -1,0 +1,54 @@
+---
+const { title, apiEndpoint, chartType = 'bar', refreshInterval = 60000 } = Astro.props;
+
+// Fetch data server-side (optional)
+const response = await fetch(apiEndpoint);
+const initialData = await response.json();
+const chartId = `chart-${title.toLowerCase().replace(/\s+/g, '-')}`;
+---
+
+<div class="tile p-4 bg-white shadow-md rounded-2xl">
+  <h2 class="text-lg font-semibold mb-2">{title}</h2>
+  <canvas id={chartId} width="400" height="250"></canvas>
+
+  <script type="module" is:inline>
+    import Chart from 'https://cdn.jsdelivr.net/npm/chart.js';
+
+    const ctx = document.getElementById('{chartId}').getContext('2d');
+    let chart;
+
+    async function fetchData() {
+      const res = await fetch('{apiEndpoint}');
+      const data = await res.json();
+      const labels = data.map(d => d.label);
+      const values = data.map(d => d.value);
+
+      if (!chart) {
+        chart = new Chart(ctx, {
+          type: '{chartType}',
+          data: {
+            labels,
+            datasets: [{
+              label: '{title}',
+              data: values,
+              backgroundColor: '{chartType}' === 'bar' ? 'rgba(75, 192, 192, 0.2)' : 'transparent',
+              borderColor: '{chartType}' === 'line' ? 'rgba(75, 192, 192, 1)' : 'rgba(75, 192, 192, 0.2)',
+              borderWidth: 2,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          }
+        });
+      } else {
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = values;
+        chart.update();
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, {refreshInterval});
+  </script>
+</div>

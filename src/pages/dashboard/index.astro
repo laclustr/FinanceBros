@@ -3,6 +3,7 @@ export const prerender = false;
 import { verifyToken } from '../api/verify-token';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
+import DashboardTile from '../../components/DashboardComps/DashboardTile.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -15,8 +16,24 @@ if (!user) {
 ---
 
 <Layout>
-  <div class="flex flex-col items-left pt-3 p-5">
-    <h1 class="">Welcome, {user.email}!</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <DashboardTile
+      title="Sales"
+      apiEndpoint="https://api.example.com/sales"
+      chartType="bar"
+      refreshInterval={30000}
+    />
+    <DashboardTile
+      title="Website Traffic"
+      apiEndpoint="https://api.example.com/traffic"
+      chartType="line"
+      refreshInterval={60000}
+    />
+    <DashboardTile
+      title="User Signups"
+      apiEndpoint="https://api.example.com/signups"
+      chartType="bar"
+    />
   </div>
   <DashboardNav />
 </Layout>

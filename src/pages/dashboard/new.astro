@@ -3,10 +3,8 @@ export const prerender = false;
 import { verifyToken } from '../api/verify-token';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
-
-import { Dropdown, DropdownTrigger, DropdownContent, DropdownItem } from "@/components/starwind/dropdown";
 import { Button } from "@/components/starwind/button";
-import DropdownTriangle from '@tabler/icons/filled/triangle-inverted.svg';
+import { Card, CardHeader, CardContent } from "@/components/starwind/card";
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -18,25 +16,378 @@ if (!user) {
 }
 ---
 
-<Layout title="New">
-  <div class="flex min-h-screen p-10 bg-blue-50 relative">
-    <div class="relative">
-      <Dropdown>
-        <DropdownTrigger asChild>
-          <Button class="flex items-center gap-1 text-base font-normal">
-            New
-            <DropdownTriangle class="max-w-2.5 max-h-2.5 inline align-middle" />
-          </Button>
-        </DropdownTrigger>
-        <DropdownContent class="absolute left-0 top-full mt-2 bg-white shadow-md border z-50">
-          <DropdownItem as="div">Purchase</DropdownItem>
-          <DropdownItem as="div">Goal</DropdownItem>
-          <DropdownItem as="div">Investment</DropdownItem>
-        </DropdownContent>
-      </Dropdown>
+<Layout title="Add New Entry">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+    <div class="flex-1 p-4 sm:p-6 lg:p-8">
+      <div class="max-w-4xl mx-auto h-full flex flex-col">
+        <!-- Header -->
+        <div class="mb-6 sm:mb-8">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Add New Entry</h1>
+          <p class="text-sm sm:text-base text-gray-600">Track your purchases, set goals, or record investments</p>
+        </div>
+
+        <!-- Main Content Card -->
+        <Card class="flex-1 flex flex-col shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader class="pb-0">
+            <!-- Tab Navigation -->
+            <div class="flex border-b border-gray-200 -mx-6 px-6">
+              <button 
+                class="tab-button flex-1 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-center border-b-2 border-blue-600 text-blue-600 hover:text-blue-700 transition-all duration-200" 
+                data-tab="purchase"
+              >
+                <div class="flex items-center justify-center gap-1 sm:gap-2">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                  </svg>
+                  <span class="hidden sm:inline">Purchase</span>
+                  <span class="sm:hidden">Buy</span>
+                </div>
+              </button>
+              <button 
+                class="tab-button flex-1 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 transition-all duration-200" 
+                data-tab="goal"
+              >
+                <div class="flex items-center justify-center gap-1 sm:gap-2">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                  </svg>
+                  <span>Goal</span>
+                </div>
+              </button>
+              <button 
+                class="tab-button flex-1 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 transition-all duration-200" 
+                data-tab="investment"
+              >
+                <div class="flex items-center justify-center gap-1 sm:gap-2">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                  </svg>
+                  <span class="hidden sm:inline">Investment</span>
+                  <span class="sm:hidden">Invest</span>
+                </div>
+              </button>
+            </div>
+          </CardHeader>
+
+          <CardContent class="flex-1 p-4 sm:p-6 lg:p-8">
+            <!-- Purchase Tab -->
+            <div id="purchase-tab" class="tab-content h-full flex flex-col">
+              <form method="POST" action="/api/user/push/purchases" class="flex-1 flex flex-col" novalidate>
+                <div class="text-center mb-6 sm:mb-8">
+                  <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full mb-4">
+                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Record a Purchase</h2>
+                  <p class="text-sm sm:text-base text-gray-600">Track your spending and expenses</p>
+                </div>
+                
+                <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
+                  <div>
+                    <label for="purchase-title" class="block text-sm font-medium text-gray-700 mb-2">
+                      Purchase Title
+                    </label>
+                    <input 
+                      type="text" 
+                      id="purchase-title"
+                      name="title" 
+                      placeholder="e.g., Groceries, Gas, Coffee" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                  
+                  <div>
+                    <label for="purchase-amount" class="block text-sm font-medium text-gray-700 mb-2">
+                      Amount ($)
+                    </label>
+                    <input 
+                      type="number" 
+                      id="purchase-amount"
+                      step="0.01" 
+                      name="amount" 
+                      placeholder="0.00" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                </div>
+                
+                <div class="mt-6 sm:mt-8 max-w-md mx-auto w-full">
+                  <Button 
+                    type="submit" 
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm sm:text-base"
+                  >
+                    <span class="submit-text">Add Purchase</span>
+                    <span class="loading-text hidden">Processing...</span>
+                  </Button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Goal Tab -->
+            <div id="goal-tab" class="tab-content h-full flex flex-col hidden">
+              <form method="POST" action="/api/user/push/goals" class="flex-1 flex flex-col" novalidate>
+                <div class="text-center mb-6 sm:mb-8">
+                  <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4">
+                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Set a Goal</h2>
+                  <p class="text-sm sm:text-base text-gray-600">Define your savings targets and deadlines</p>
+                </div>
+                
+                <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
+                  <div>
+                    <label for="goal-title" class="block text-sm font-medium text-gray-700 mb-2">
+                      Goal Title
+                    </label>
+                    <input 
+                      type="text" 
+                      id="goal-title"
+                      name="title" 
+                      placeholder="e.g., Emergency Fund, Vacation, New Car" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                  
+                  <div>
+                    <label for="goal-target" class="block text-sm font-medium text-gray-700 mb-2">
+                      Target Amount ($)
+                    </label>
+                    <input 
+                      type="number" 
+                      id="goal-target"
+                      step="0.01" 
+                      name="target" 
+                      placeholder="0.00" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                  
+                  <div>
+                    <label for="goal-deadline" class="block text-sm font-medium text-gray-700 mb-2">
+                      Target Date
+                    </label>
+                    <input 
+                      type="date" 
+                      id="goal-deadline"
+                      name="deadline" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                </div>
+                
+                <div class="mt-6 sm:mt-8 max-w-md mx-auto w-full">
+                  <Button 
+                    type="submit" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm sm:text-base"
+                  >
+                    <span class="submit-text">Create Goal</span>
+                    <span class="loading-text hidden">Processing...</span>
+                  </Button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Investment Tab -->
+            <div id="investment-tab" class="tab-content h-full flex flex-col hidden">
+              <form method="POST" action="/api/user/push/investments" class="flex-1 flex flex-col" novalidate>
+                <div class="text-center mb-6 sm:mb-8">
+                  <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4">
+                    <svg class="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                  </div>
+                  <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Record Investment</h2>
+                  <p class="text-sm sm:text-base text-gray-600">Track your investment portfolio</p>
+                </div>
+                
+                <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
+                  <div>
+                    <label for="investment-asset" class="block text-sm font-medium text-gray-700 mb-2">
+                      Asset Name
+                    </label>
+                    <input 
+                      type="text" 
+                      id="investment-asset"
+                      name="assetName" 
+                      placeholder="e.g., AAPL, Bitcoin, S&P 500 ETF" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                  
+                  <div>
+                    <label for="investment-amount" class="block text-sm font-medium text-gray-700 mb-2">
+                      Investment Amount ($)
+                    </label>
+                    <input 
+                      type="number" 
+                      id="investment-amount"
+                      step="0.01" 
+                      name="amount" 
+                      placeholder="0.00" 
+                      class="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                    />
+                    <div class="error-message hidden text-red-600 text-xs sm:text-sm mt-1"></div>
+                  </div>
+                </div>
+                
+                <div class="mt-6 sm:mt-8 max-w-md mx-auto w-full">
+                  <Button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm sm:text-base"
+                  >
+                    <span class="submit-text">Add Investment</span>
+                    <span class="loading-text hidden">Processing...</span>
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>  
+    
+    <DashboardNav />
+  </div>
 
-  <DashboardNav />
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tabButtons = document.querySelectorAll('.tab-button');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      // Custom validation messages
+      const validationMessages = {
+        'purchase-title': 'Please enter a purchase title',
+        'purchase-amount': 'Please enter a valid amount',
+        'goal-title': 'Please enter a goal title',
+        'goal-target': 'Please enter a target amount',
+        'goal-deadline': 'Please select a target date',
+        'investment-asset': 'Please enter an asset name',
+        'investment-amount': 'Please enter an investment amount'
+      };
+
+      function switchTab(targetTab) {
+        // Remove active state from all buttons
+        tabButtons.forEach(button => {
+          button.classList.remove('border-blue-600', 'text-blue-600');
+          button.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // Hide all tab contents
+        tabContents.forEach(content => {
+          content.classList.add('hidden');
+        });
+        
+        // Activate the target tab button
+        const activeButton = document.querySelector(`[data-tab="${targetTab}"]`);
+        activeButton.classList.add('border-blue-600', 'text-blue-600');
+        activeButton.classList.remove('border-transparent', 'text-gray-500');
+        
+        // Show the target tab content
+        const activeContent = document.getElementById(`${targetTab}-tab`);
+        activeContent.classList.remove('hidden');
+      }
+      
+      // Add click event listeners to tab buttons
+      tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const targetTab = this.getAttribute('data-tab');
+          switchTab(targetTab);
+        });
+      });
+      
+      // Initialize the first tab as active
+      switchTab('purchase');
+
+      // Custom validation for all forms
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        const inputs = form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
+        
+        // Add real-time validation
+        inputs.forEach(input => {
+          input.addEventListener('blur', function() {
+            validateField(this);
+          });
+          
+          input.addEventListener('input', function() {
+            // Clear error when user starts typing
+            const errorDiv = this.parentNode.querySelector('.error-message');
+            if (errorDiv) {
+              errorDiv.classList.add('hidden');
+              this.classList.remove('border-red-500');
+            }
+          });
+        });
+        
+        form.addEventListener('submit', function(e) {
+          e.preventDefault();
+          
+          let isValid = true;
+          const submitButton = this.querySelector('button[type="submit"]');
+          const submitText = submitButton.querySelector('.submit-text');
+          const loadingText = submitButton.querySelector('.loading-text');
+          
+          // Validate all required fields
+          inputs.forEach(input => {
+            if (!validateField(input)) {
+              isValid = false;
+            }
+          });
+          
+          if (isValid) {
+            // Show loading state
+            submitText.classList.add('hidden');
+            loadingText.classList.remove('hidden');
+            submitButton.disabled = true;
+            
+            // Submit the form
+            this.submit();
+          }
+        });
+      });
+      
+      function validateField(field) {
+        const value = field.value.trim();
+        const errorDiv = field.parentNode.querySelector('.error-message');
+        const fieldId = field.id;
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        if (!value) {
+          isValid = false;
+          errorMessage = validationMessages[fieldId] || 'This field is required';
+        } else if (field.type === 'number' && (isNaN(value) || parseFloat(value) <= 0)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid positive number';
+        } else if (field.type === 'date' && new Date(value) < new Date()) {
+          // Only validate future dates for goals
+          if (fieldId === 'goal-deadline') {
+            isValid = false;
+            errorMessage = 'Please select a future date';
+          }
+        }
+        
+        if (!isValid) {
+          field.classList.add('border-red-500');
+          errorDiv.textContent = errorMessage;
+          errorDiv.classList.remove('hidden');
+        } else {
+          field.classList.remove('border-red-500');
+          errorDiv.classList.add('hidden');
+        }
+        
+        return isValid;
+      }
+    });
+  </script>
 </Layout>
-
