@@ -23,26 +23,10 @@ const {
 	<body>
 		<script>
 			if ('serviceWorker' in navigator) {
-  const isLocalDev = location.hostname === 'localhost' && (location.port === '3000' || location.port === '4321');
-  
-  if (isLocalDev) {
-    navigator.serviceWorker.getRegistrations().then(function(registrations) {
-      for(let registration of registrations) {
-        registration.unregister();
-      }
-    });
-  } else {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then((registration) => {
-          console.log('SW registered: ', registration);
-        })
-        .catch((registrationError) => {
-          console.log('SW registration failed: ', registrationError);
-        });
-    });
-  }
-}
+			  navigator.serviceWorker.register('/sw.js')
+				.then(() => console.log('Service Worker registered'))
+				.catch(console.error);
+			}
 		</script>	
 		<SpeedInsights/>
 		<Analytics/>
