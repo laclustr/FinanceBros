@@ -14,7 +14,7 @@
   "skipLibCheck": true,
   "forceConsistentCasingInFileNames": true,
   "outDir": "dist",
-  "types": ["@prisma/client"]
+  "types": ["@prisma/client", "vite-pwa/client"]
 }
 }
 

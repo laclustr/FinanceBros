@@ -15,19 +15,14 @@ const {
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="theme-color" content="#3367D6" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Finance Bros - {title}</title>
 	</head>
 	<body>
 		<script>
-			if ('serviceWorker' in navigator) {
-			  navigator.serviceWorker.register('/sw.js')
-				.then(() => console.log('Service Worker registered'))
-				.catch(console.error);
-			}
-		</script>	
+			import '../sw-registration.ts';
+		</script>
 		<SpeedInsights/>
 		<Analytics/>
 		<slot />
