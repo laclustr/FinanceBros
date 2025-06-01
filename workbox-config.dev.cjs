@@ -1,10 +1,9 @@
 module.exports = {
     globDirectory: 'src/',
     globPatterns: [
-      '**/*.{html,js,css,json,ico,png,jpg,svg,woff2,woff,ttf,webmanifest}'
+      '**/*.{html,js,css,png,jpg,jpeg,gif,svg,webp,avif,ico,woff,woff2,ttf,eot,json,xml,txt,pdf}'
     ],
     swDest: 'public/sw.js',
     swSrc: 'public/sw-base.js',
-    maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+    maximumFileSizeToCacheInBytes: 50 * 1024 * 1024
   };
-  
