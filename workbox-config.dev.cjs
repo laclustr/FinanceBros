@@ -4,6 +4,6 @@ module.exports = {
     '**/*.*'
   ],
   swDest: 'public/sw.js',
-  swSrc: 'public/sw-base.js',
+  swSrc: 'public/base.js',
   maximumFileSizeToCacheInBytes: 100 * 1024 * 1024
 };
