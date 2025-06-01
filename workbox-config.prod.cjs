@@ -1,9 +1,9 @@
 module.exports = {
-  globDirectory: 'dist/client',
+  globDirectory: 'dist/',
   globPatterns: [
     '**/*.*'
   ],
-  swDest: 'dist/client/sw.js',
+  swDest: 'dist/sw.js',
   swSrc: 'public/base.js',
   maximumFileSizeToCacheInBytes: 100 * 1024 * 1024
 };
