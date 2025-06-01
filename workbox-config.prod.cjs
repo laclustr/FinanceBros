@@ -3,7 +3,7 @@ module.exports = {
   globPatterns: [
     '**/*.*'
   ],
-  swDest: 'dist/sw.js',
+  swDest: '/sw.js',
   swSrc: 'public/base.js',
   maximumFileSizeToCacheInBytes: 100 * 1024 * 1024
 };
