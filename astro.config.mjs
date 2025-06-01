@@ -1,4 +1,4 @@
-// astro.config.mjs
+// @ts-check
 import { defineConfig } from 'astro/config';
 import tailwindcss from "@tailwindcss/vite";
 import vercel from '@astrojs/vercel';
@@ -22,28 +22,25 @@ export default defineConfig({
         display: 'standalone',
         start_url: '/',
         icons: [
-          { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
-        ],
+          {
+            src: '/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          }
+        ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
-
-        // Fallback → "/" only for non‐login routes
-        navigateFallback: '/',
-        // Exclude /login/sign-in and /login/sign-up from the fallback allowlist
-        navigateFallbackAllowlist: [
-          // “Any path that does NOT start with /login/sign-in or /login/sign-up” 
-          // will use navigateFallback: '/'. 
-          // But /login/sign-in and /login/sign-up themselves will NOT match this, 
-          // so they won't be force-redirected to '/' when offline.
-          /^(?!\/login\/sign-(?:in|up)).*$/
-        ],
-
+        navigateFallback: '/',  // fallback page when offline
+        navigateFallbackAllowlist: [/.*/],  // <- Allow *all* routes for navigation caching
         runtimeCaching: [
           {
-            // API calls → network-first
             urlPattern: /^.*\/api\/.*/,
             handler: 'NetworkFirst',
             options: {
@@ -51,8 +48,6 @@ export default defineConfig({
             },
           },
           {
-            // HTML navigations → network-first (but if offline and not cached, 
-            // non-login pages will fall back to '/' because of navigateFallback)
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
@@ -60,7 +55,6 @@ export default defineConfig({
             },
           },
           {
-            // JS/CSS/Fonts → stale-while-revalidate
             urlPattern: /\.(?:js|css|woff2?)$/,
             handler: 'StaleWhileRevalidate',
             options: {
@@ -68,7 +62,6 @@ export default defineConfig({
             },
           },
           {
-            // Images → cache-first
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
             handler: 'CacheFirst',
             options: {
@@ -76,7 +69,6 @@ export default defineConfig({
             },
           },
           {
-            // Everything else → network-first
             urlPattern: /.*/,
             handler: 'NetworkFirst',
             options: {
@@ -84,7 +76,7 @@ export default defineConfig({
             },
           },
         ],
-      },
+      },      
       devOptions: {
         enabled: true,
         type: 'module',
