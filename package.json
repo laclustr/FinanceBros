@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "vercel-dev": "prisma generate && vercel dev",
-    "build": "astro build",
+    "build": "prisma generate && astro build && npx workbox injectManifest workbox-config.prod.cjs",
     "preview": "astro preview",
     "astro": "astro",
     "test": "vitest",
