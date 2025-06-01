@@ -1,6 +1,6 @@
-// @ts-check
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 import AstroPWA from '@vite-pwa/astro';
 
@@ -23,15 +23,19 @@ export default defineConfig({
         start_url: '/dashboard',
         icons: [
           { src: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' }
-        ]
+          { src: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+        ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
-        globDirectory: 'dist', // adjust as needed
+        additionalManifestEntries: [
+          { url: '/', revision: null },
+          { url: '/dashboard', revision: null },
+          { url: '/settings', revision: null },
+        ],
         maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
-        navigateFallback: '/dashboard',  // <- Or explicitly set to the correct fallback
-        navigateFallbackAllowlist: [/.*/], // Still keep all routes valid
+        navigateFallback: '/dashboard', // Optional, fallback to dashboard
+        navigateFallbackAllowlist: [/.*/],
         runtimeCaching: [
           {
             urlPattern: /^.*\/api\/.*/,
@@ -64,6 +68,6 @@ export default defineConfig({
         enabled: true,
         type: 'module',
       },
-    }),    
+    }),
   ],
 });
