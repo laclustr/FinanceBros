@@ -1,4 +1,4 @@
-// @ts-check
+// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import tailwindcss from "@tailwindcss/vite";
 import vercel from '@astrojs/vercel';
@@ -37,50 +37,50 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,jpg,jpeg,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
-        navigateFallback: '/',  // fallback page when offline
-        navigateFallbackAllowlist: [/.*/],  // <- Allow *all* routes for navigation caching
+        navigateFallback: '/',
+        navigateFallbackAllowlist: [/.*/],
         runtimeCaching: [
           {
             urlPattern: /^.*\/api\/.*/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'api-cache',
-            },
+              cacheName: 'api-cache'
+            }
           },
           {
             urlPattern: ({ request }) => request.mode === 'navigate',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'pages-cache',
-            },
+              cacheName: 'pages-cache'
+            }
           },
           {
             urlPattern: /\.(?:js|css|woff2?)$/,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'static-resources',
-            },
+              cacheName: 'static-resources'
+            }
           },
           {
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'images',
-            },
+              cacheName: 'images'
+            }
           },
           {
             urlPattern: /.*/,
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'fallback-cache',
-            },
-          },
-        ],
-      },      
+              cacheName: 'fallback-cache'
+            }
+          }
+        ]
+      },
       devOptions: {
         enabled: true,
-        type: 'module',
-      },
-    }),
-  ],
+        type: 'module'
+      }
+    })
+  ]
 });
