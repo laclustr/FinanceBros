@@ -8,7 +8,7 @@ module.exports = {
   globIgnores: [
     'sw.js'
   ],
-  swDest: path.join(__dirname, 'dist', 'sw.js'),
+  swDest: path.join(__dirname, 'about', 'sw.js'),
   swSrc: path.join(__dirname, 'public', 'sw-base.js'),
   maximumFileSizeToCacheInBytes: 50 * 1024 * 1024
 };
