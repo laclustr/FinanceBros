@@ -6,16 +6,11 @@ const { NetworkFirst, CacheFirst, StaleWhileRevalidate } = workbox.strategies;
 const { CacheableResponsePlugin } = workbox.cacheableResponse;
 const { ExpirationPlugin } = workbox.expiration;
 
-const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-const isDevelopment = isLocalhost && (location.port === '3000' || location.port === '4321');
-
-if (!isDevelopment) {
-  cleanupOutdatedCaches();
-  precacheAndRoute(self.__WB_MANIFEST);
-}
+cleanupOutdatedCaches();
+precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(
-  ({ request, url }) => !isDevelopment && request.destination === 'document',
+  ({ request }) => request.destination === 'document',
   new NetworkFirst({
     cacheName: 'pages-cache',
     plugins: [
@@ -31,7 +26,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request, url }) => !isDevelopment && (request.destination === 'script' || request.destination === 'style'),
+  ({ request }) => request.destination === 'script' || request.destination === 'style',
   new NetworkFirst({
     cacheName: 'assets-cache',
     plugins: [
@@ -47,7 +42,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request, url }) => !isDevelopment && (request.destination === 'image' || request.destination === 'video' || request.destination === 'audio'),
+  ({ request }) => request.destination === 'image' || request.destination === 'video' || request.destination === 'audio',
   new CacheFirst({
     cacheName: 'media-cache',
     plugins: [
@@ -63,7 +58,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ url }) => !isDevelopment && url.pathname.startsWith('/api/'),
+  ({ url }) => url.pathname.startsWith('/api/'),
   new NetworkFirst({
     cacheName: 'api-cache',
     networkTimeoutSeconds: 3,
@@ -80,7 +75,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request, url }) => !isDevelopment && request.destination === 'font',
+  ({ request }) => request.destination === 'font',
   new CacheFirst({
     cacheName: 'fonts-cache',
     plugins: [
@@ -96,7 +91,7 @@ registerRoute(
 );
 
 registerRoute(
-  ({ request, url }) => !isDevelopment && request.mode === 'navigate',
+  ({ request }) => request.mode === 'navigate',
   new NetworkFirst({
     cacheName: 'navigation-cache',
     plugins: [
@@ -108,7 +103,10 @@ registerRoute(
 );
 
 self.addEventListener('fetch', (event) => {
-  if (isDevelopment) {
+  const url = new URL(event.request.url);
+  const isLocalDev = url.hostname === 'localhost' && (url.port === '3000' || url.port === '4321');
+  
+  if (isLocalDev) {
     return;
   }
   

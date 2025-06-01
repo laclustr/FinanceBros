@@ -20,27 +20,26 @@ import "../global.css"
 	<body>
 		<script>
 			if ('serviceWorker' in navigator) {
-			const isLocalhost = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-			const isDevelopment = isLocalhost && (location.port === '3000' || location.port === '4321');
-			
-			if (!isDevelopment) {
-				window.addEventListener('load', () => {
-				navigator.serviceWorker.register('/sw.js')
-					.then((registration) => {
-					console.log('SW registered: ', registration);
-					})
-					.catch((registrationError) => {
-					console.log('SW registration failed: ', registrationError);
-					});
-				});
-			} else {
-				navigator.serviceWorker.getRegistrations().then(function(registrations) {
-				for(let registration of registrations) {
-					registration.unregister();
-				}
-				});
-			}
-			}
+  const isLocalDev = location.hostname === 'localhost' && (location.port === '3000' || location.port === '4321');
+  
+  if (isLocalDev) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      for(let registration of registrations) {
+        registration.unregister();
+      }
+    });
+  } else {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration);
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: ', registrationError);
+        });
+    });
+  }
+}
 		</script>
 		<SpeedInsights/>
 		<Analytics/>
