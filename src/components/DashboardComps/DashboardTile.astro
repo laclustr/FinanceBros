@@ -1,54 +1,93 @@
 ---
-const { title, apiEndpoint, chartType = 'bar', refreshInterval = 60000 } = Astro.props;
-
-// Fetch data server-side (optional)
-const response = await fetch(apiEndpoint);
-const initialData = await response.json();
-const chartId = `chart-${title.toLowerCase().replace(/\s+/g, '-')}`;
+const { title, apiEndpoint, refreshInterval = 60000 } = Astro.props;
+const listId = `list-${title.toLowerCase().replace(/\s+/g, '-')}`;
 ---
 
 <div class="tile p-4 bg-white shadow-md rounded-2xl">
-  <h2 class="text-lg font-semibold mb-2">{title}</h2>
-  <canvas id={chartId} width="400" height="250"></canvas>
+  <h2 class="text-lg font-semibold mb-4">{title}</h2>
+  <ul id={listId} class="space-y-2 text-sm text-gray-700">
+    <li>Loading purchases...</li>
+  </ul>
 
-  <script type="module" is:inline>
-    import Chart from 'https://cdn.jsdelivr.net/npm/chart.js';
+  <script type="module" define:vars={{ listId, apiEndpoint, refreshInterval }}>
+    const listElement = document.getElementById(listId);
 
-    const ctx = document.getElementById('{chartId}').getContext('2d');
-    let chart;
+    function formatDate(dateStr) {
+      try {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) return 'Invalid Date';
 
-    async function fetchData() {
-      const res = await fetch('{apiEndpoint}');
-      const data = await res.json();
-      const labels = data.map(d => d.label);
-      const values = data.map(d => d.value);
+        const now = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(now.getMonth() - 1);
 
-      if (!chart) {
-        chart = new Chart(ctx, {
-          type: '{chartType}',
-          data: {
-            labels,
-            datasets: [{
-              label: '{title}',
-              data: values,
-              backgroundColor: '{chartType}' === 'bar' ? 'rgba(75, 192, 192, 0.2)' : 'transparent',
-              borderColor: '{chartType}' === 'line' ? 'rgba(75, 192, 192, 1)' : 'rgba(75, 192, 192, 0.2)',
-              borderWidth: 2,
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-          }
-        });
-      } else {
-        chart.data.labels = labels;
-        chart.data.datasets[0].data = values;
-        chart.update();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        if (date > oneMonthAgo) {
+          const weekdayIndex = date.getDay(); // 0 (Sun) to 6 (Sat)
+          const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+          const weekday = weekdays[weekdayIndex];
+          return `${weekday}/${month}`;
+        } else {
+          return `${month}/${year}`;
+        }
+      } catch (e) {
+        console.error('formatDate error:', e);
+        return 'Error';
       }
     }
 
-    fetchData();
-    setInterval(fetchData, {refreshInterval});
+    async function fetchAndRender() {
+      try {
+        // Create date range - last 30 days by default
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(endDate.getDate() - 30);
+
+        const response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            startDate: startDate.toISOString(),
+            endDate: endDate.toISOString()
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error('Expected array but got: ' + JSON.stringify(data));
+        }
+
+        data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        listElement.innerHTML = ''; // Clear "Loading..." message
+
+        if (data.length === 0) {
+          listElement.innerHTML = '<li>No purchases found.</li>';
+          return;
+        }
+
+        for (const item of data) {
+          const li = document.createElement('li');
+          const date = formatDate(item.createdAt);
+          li.textContent = `${item.label} (${date})`;
+          listElement.appendChild(li);
+        }
+      } catch (err) {
+        console.error('Failed to fetch purchases:', err);
+        listElement.innerHTML = '<li class="text-red-600">Error loading data. Check console.</li>';
+      }
+    }
+
+    fetchAndRender();
+    setInterval(fetchAndRender, refreshInterval);
   </script>
 </div>

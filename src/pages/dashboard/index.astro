@@ -16,24 +16,13 @@ if (!user) {
 ---
 
 <Layout>
-  <!-- <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
     <DashboardTile
-      title="Sales"
-      apiEndpoint="https://api.example.com/sales"
-      chartType="bar"
+      title="Purchases"
+      apiEndpoint="/api/user/fetch/purchases"
+      chartType="list"
       refreshInterval={30000}
     />
-    <DashboardTile
-      title="Website Traffic"
-      apiEndpoint="https://api.example.com/traffic"
-      chartType="line"
-      refreshInterval={60000}
-    />
-    <DashboardTile
-      title="User Signups"
-      apiEndpoint="https://api.example.com/signups"
-      chartType="bar"
-    />
-  </div> -->
+  </div>
   <DashboardNav />
 </Layout>
