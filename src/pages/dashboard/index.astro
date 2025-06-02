@@ -5,6 +5,7 @@ import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
 import DashboardListTile from '../../components/DashboardComps/DashboardListTile.astro';
 import DashboardStockTile from '../../components/DashboardComps/DashboardStockTile.astro';
+import DashboardDepositTile from '../../components/DashboardComps/DashboardDepositTile.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -28,6 +29,12 @@ if (!user) {
       title="Investments"
       apiEndpoint="/api/user/fetch/investments"
       chartType="line"
+      refreshInterval={30000}
+    />
+    <DashboardDepositTile
+      title="Deposits"
+      apiEndpoint="/api/user/fetch/deposits"
+      chartType="list"
       refreshInterval={30000}
     />
   </div>
