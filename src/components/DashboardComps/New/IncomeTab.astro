@@ -1,0 +1,48 @@
+---
+import { Button } from "@/components/starwind/button";
+import FormField from './FormField.astro';
+---
+
+<div id="deposit-tab" class="tab-content h-full flex flex-col">
+  <form method="POST" action="/api/user/push/deposits" class="flex-1 flex flex-col" novalidate>
+    <div class="text-center mb-6 sm:mb-8">
+      <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full mb-4">
+        <svg class="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+</svg>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Record a Deposit</h2>
+      <p class="text-sm sm:text-base text-gray-600">Track your income and deposits</p>
+    </div>
+    
+    <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
+      <FormField
+        id="deposit-title"
+        name="title"
+        label="Income Source"
+        type="text"
+        placeholder="e.g., Salary, Freelance, Gift"
+        focusColor="green"
+      />
+      
+      <FormField
+        id="deposit-amount"
+        name="amount"
+        label="Amount ($)"
+        type="text"
+        placeholder="0.00"
+        focusColor="green"
+      />
+    </div>
+    
+    <div class="mt-6 sm:mt-8 max-w-md mx-auto w-full">
+      <Button 
+        type="submit" 
+        class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 text-sm sm:text-base"
+      >
+        <span class="submit-text">Add Deposit</span>
+        <span class="loading-text hidden">Processing...</span>
+      </Button>
+    </div>
+  </form>
+</div>

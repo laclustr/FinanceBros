@@ -15,11 +15,21 @@ model User {
   password    String
   createdAt   DateTime      @default(now())
   purchases   Purchase[]
+  deposits    Deposit[]
   goals       Goal[]
   investments Investment[]
 }
 
 model Purchase {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  amount    Float
+  date      DateTime @default(now())
+}
+
+model Deposit {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id])

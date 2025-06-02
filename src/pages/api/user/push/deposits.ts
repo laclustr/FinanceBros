@@ -17,7 +17,7 @@ export async function POST({ request, cookies, redirect }) {
     const amountStr = form.get('amount') as string;
     
     if (!title || title.trim().length === 0) {
-      return new Response(JSON.stringify({ error: 'Title is required' }), {
+      return new Response(JSON.stringify({ error: 'Income source is required' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' }
       });
@@ -40,7 +40,7 @@ export async function POST({ request, cookies, redirect }) {
       });
     }
 
-    await prisma.Purchase.create({
+    await prisma.Deposit.create({
       data: {
         userId: user.id,
         title: title.trim(),
@@ -51,7 +51,7 @@ export async function POST({ request, cookies, redirect }) {
     return redirect('/dashboard');
     
   } catch (error) {
-    console.error('Error creating purchase:', error);
+    console.error('Error creating deposit:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
