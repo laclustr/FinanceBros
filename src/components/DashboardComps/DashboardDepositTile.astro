@@ -69,7 +69,7 @@ const listId = `list-${title.toLowerCase().replace(/\s+/g, '-')}`;
         listElement.innerHTML = '';
 
         if (data.length === 0) {
-          listElement.innerHTML = '<li>No purchases found.</li>';
+          listElement.innerHTML = '<li>No deposits found.</li>';
           return;
         }
 
@@ -80,7 +80,7 @@ const listId = `list-${title.toLowerCase().replace(/\s+/g, '-')}`;
           listElement.appendChild(li);
         }
       } catch (err) {
-        console.error('Failed to fetch purchases:', err);
+        console.error('Failed to fetch deposits:', err);
         listElement.innerHTML = '<li class="text-red-600">Error loading data. Check console.</li>';
       }
     }
