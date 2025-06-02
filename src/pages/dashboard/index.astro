@@ -3,7 +3,8 @@ export const prerender = false;
 import { verifyToken } from '../api/verify-token';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
-import DashboardTile from '../../components/DashboardComps/DashboardTile.astro';
+import DashboardListTile from '../../components/DashboardComps/DashboardListTile.astro';
+import DashboardStockTile from '../../components/DashboardComps/DashboardStockTile.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -17,10 +18,16 @@ if (!user) {
 
 <Layout>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <DashboardTile
+    <DashboardListTile
       title="Purchases"
       apiEndpoint="/api/user/fetch/purchases"
       chartType="list"
+      refreshInterval={30000}
+    />
+    <DashboardStockTile
+      title="Investments"
+      apiEndpoint="/api/user/fetch/investments"
+      chartType="line"
       refreshInterval={30000}
     />
   </div>

@@ -40,7 +40,7 @@ export async function POST({ request, cookies, redirect }) {
     });
 
   } catch (error) {
-    console.error('Error fetching purchases:', error);
+    console.error('Error fetching purchases:', error.message, error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
