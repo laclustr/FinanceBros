@@ -251,4 +251,71 @@ import InvestmentTab from './InvestmentTab.astro';
 }
 
   });
+
+  const investmentForm = document.getElementById('investment-form');
+
+if (investmentForm) {
+  investmentForm.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const inputs = investmentForm.querySelectorAll('input[type="text"], input[type="number"]');
+    const submitButton = investmentForm.querySelector('button[type="submit"]');
+    const submitText = submitButton.querySelector('.submit-text');
+    const loadingText = submitButton.querySelector('.loading-text');
+
+    let isValid = true;
+    inputs.forEach(input => {
+      if (!validateField(input)) {
+        isValid = false;
+      }
+    });
+
+    if (!isValid) return;
+
+    // Clean commas from amount
+    const amountField = investmentForm.querySelector('input[name="amount"]');
+    if (amountField && amountField.value) {
+      amountField.value = amountField.value.replace(/,/g, '');
+    }
+
+    // Show loading state
+    submitText.classList.add('hidden');
+    loadingText.classList.remove('hidden');
+    submitButton.disabled = true;
+
+    const formData = new FormData(investmentForm);
+
+    try {
+      const response = await fetch(investmentForm.action, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        window.location.href = '/dashboard'; // ✅ redirect only on success
+      } else {
+        throw new Error(result.error || 'Something went wrong');
+      }
+    } catch (err) {
+      console.error('Submission error:', err);
+
+      // Restore UI
+      submitText.classList.remove('hidden');
+      loadingText.classList.add('hidden');
+      submitButton.disabled = false;
+
+      // Show error near the asset name field
+      const assetInput = investmentForm.querySelector('#investment-asset');
+      const errorDiv = assetInput?.parentNode?.querySelector('.error-message');
+      if (errorDiv) {
+        errorDiv.textContent = err.message;
+        errorDiv.classList.remove('hidden');
+        assetInput.classList.add('border-red-500');
+      }
+    }
+  });
+}
+
 </script>
