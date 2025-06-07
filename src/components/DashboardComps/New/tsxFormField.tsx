@@ -65,7 +65,7 @@ const SearchField: React.FC<Props> = ({ id, name, label, placeholder, focusColor
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-full">
+    <div ref={containerRef} className="relative w-full pb-6">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-2">
         {label}
       </label>
