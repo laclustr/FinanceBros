@@ -209,37 +209,46 @@ import InvestmentTab from './InvestmentTab.astro';
     });
     
     function validateField(field) {
-      const value = field.value.trim();
-      const errorDiv = field.parentNode.querySelector('.error-message');
-      const fieldId = field.id;
-      
-      let isValid = true;
-      let errorMessage = '';
-      
-      if (!value) {
-        isValid = false;
-        errorMessage = validationMessages[fieldId] || 'This field is required';
-      } else if (field.name === 'amount' && (value === '' || isNaN(value.replace(/,/g, '')) || parseFloat(value.replace(/,/g, '')) <= 0)) {
-        isValid = false;
-        errorMessage = 'Please enter a valid positive number';
-      } else if (field.type === 'date' && new Date(value) < new Date()) {
-        // Only validate future dates for goals
-        if (fieldId === 'goal-deadline') {
-          isValid = false;
-          errorMessage = 'Please select a future date';
-        }
-      }
-      
-      if (!isValid) {
-        field.classList.add('border-red-500');
-        errorDiv.textContent = errorMessage;
-        errorDiv.classList.remove('hidden');
-      } else {
-        field.classList.remove('border-red-500');
-        errorDiv.classList.add('hidden');
-      }
-      
-      return isValid;
+  const value = field.value.trim();
+  const errorDiv = field.parentNode.querySelector('.error-message');
+  const fieldId = field.id;
+
+  let isValid = true;
+  let errorMessage = '';
+
+  if (!value) {
+    isValid = false;
+    errorMessage = validationMessages[fieldId] || 'This field is required';
+  } else if (
+    field.name === 'amount' &&
+    (value === '' || isNaN(value.replace(/,/g, '')) || parseFloat(value.replace(/,/g, '')) <= 0)
+  ) {
+    isValid = false;
+    errorMessage = 'Please enter a valid positive number';
+  } else if (field.type === 'date' && new Date(value) < new Date()) {
+    if (fieldId === 'goal-deadline') {
+      isValid = false;
+      errorMessage = 'Please select a future date';
     }
+  }
+
+  if (!isValid) {
+    field.classList.add('border-red-500');
+    if (errorDiv) {
+      errorDiv.textContent = errorMessage;
+      errorDiv.classList.remove('hidden');
+    } else {
+      console.warn(`No .error-message element found near field ${fieldId}`);
+    }
+  } else {
+    field.classList.remove('border-red-500');
+    if (errorDiv) {
+      errorDiv.classList.add('hidden');
+    }
+  }
+
+  return isValid;
+}
+
   });
 </script>

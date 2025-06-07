@@ -54,12 +54,19 @@ export async function POST({ request, cookies, redirect }) {
 
     const polygonData = await polygonResponse.json();
 
-    if (!polygonData || !polygonData.results || polygonData.results.active === false) {
+    if (
+      !polygonData ||
+      !polygonData.results ||
+      !Array.isArray(polygonData.results) ||
+      polygonData.results.length === 0 ||
+      polygonData.results[0].active === false
+    ) {
       return new Response(JSON.stringify({ error: 'Invalid or inactive asset' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
+    
 
     await prisma.Investment.create({
       data: {
@@ -69,7 +76,10 @@ export async function POST({ request, cookies, redirect }) {
       },
     });
 
-    return redirect('/dashboard');
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });    
   } catch (error) {
     console.error('Error creating investment:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {

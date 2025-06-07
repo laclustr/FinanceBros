@@ -1,20 +1,25 @@
 {
   "compilerOptions": {
-  "target": "ESNext",
-  "module": "NodeNext",
-  "moduleResolution": "NodeNext",
-  "baseUrl": ".",
-  "paths": {
-    "@/*": ["src/*"]
-  },
-  "strict": true,
-  "jsx": "preserve",
-  "allowJs": true,
-  "esModuleInterop": true,
-  "skipLibCheck": true,
-  "forceConsistentCasingInFileNames": true,
-  "outDir": "dist",
-  "types": ["@prisma/client", "vite-pwa/client"]
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "strict": true,
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "types": [
+      "@prisma/client",
+      "vite-pwa/client"
+    ],
+    "jsxImportSource": "react"
+  }
 }
-}
-

@@ -1,5 +1,7 @@
 ---
+import React from "@astrojs/react";
 import { Button } from "@/components/starwind/button";
+import SearchField from './tsxFormField.tsx';
 import FormField from './FormField.astro';
 ---
 
@@ -16,13 +18,13 @@ import FormField from './FormField.astro';
     </div>
     
     <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
-      <FormField
+      <SearchField
         id="investment-asset"
         name="assetName"
         label="Asset Name"
-        type="text"
         placeholder="e.g., AAPL, Bitcoin, S&P 500 ETF"
         focusColor="blue"
+        client:load
       />
       
       <FormField
