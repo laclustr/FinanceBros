@@ -76,7 +76,7 @@ const title = type === "register" ? "Register" : "Login";
       }
       submitBtn.textContent = 'Success! Redirecting...';
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = '/login/onboarding';
       }, 1500);
     } catch (error) {
       errorMessage.textContent = error.message;
@@ -140,7 +140,7 @@ const title = type === "register" ? "Register" : "Login";
       } else {
         submitBtn.textContent = 'Success! Redirecting...';
         setTimeout(() => {
-          window.location.href = '/dashboard';
+          window.location.href = '/login/onboarding';
         }, 500);
       }
 

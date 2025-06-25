@@ -4,7 +4,6 @@ import TabNavigation from './Tabs.astro';
 import PurchaseTab from './PurchaseTab.astro';
 import DepositTab from './IncomeTab.astro';
 import GoalTab from './GoalTab.astro';
-import InvestmentTab from './InvestmentTab.astro';
 ---
 
 <Card class="flex-1 flex flex-col shadow-lg border-0 bg-white/80 backdrop-blur-sm">
@@ -45,7 +44,7 @@ import InvestmentTab from './InvestmentTab.astro';
           <span>Goal</span>
         </div>
       </button>
-      <button
+      <!-- <button
         class="tab-button flex-1 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
         data-tab="investment"
       >
@@ -56,7 +55,7 @@ import InvestmentTab from './InvestmentTab.astro';
           <span class="hidden sm:inline">Investment</span>
           <span class="sm:hidden">Invest</span>
         </div>
-      </button>
+      </button> -->
     </div>
   </CardHeader>
 
@@ -64,7 +63,6 @@ import InvestmentTab from './InvestmentTab.astro';
     <PurchaseTab />
     <DepositTab />
     <GoalTab />
-    <InvestmentTab />
   </CardContent>
 </Card>
 

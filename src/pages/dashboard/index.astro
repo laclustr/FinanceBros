@@ -1,34 +1,28 @@
 ---
 export const prerender = false;
-import { verifyToken } from '../api/verify-token';
+import { hasOnboarded } from '../../lib/auth/hasOnboarded';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
-import DashboardListTile from '../../components/DashboardComps/DashboardListTile.astro';
-import DashboardStockTile from '../../components/DashboardComps/DashboardStockTile.astro';
+import RecentTransactions from '../../components/DashboardComps/RecentTransactions.astro';
 import DashboardDepositTile from '../../components/DashboardComps/DashboardDepositTile.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
 
-const user = await verifyToken(token);
+const [user, onboarded] = await hasOnboarded(token);
 
 if (!user) {
   return redirect('/login/sign-in');
+}
+if (!onboarded) {
+  return redirect('/login/onboarding');
 }
 ---
 
 <Layout>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <DashboardListTile
+    <RecentTransactions
       title="Purchases"
-      apiEndpoint="/api/user/fetch/purchases"
-      chartType="list"
-      refreshInterval={30000}
-    />
-    <DashboardStockTile
-      title="Investments"
-      apiEndpoint="/api/user/fetch/investments"
-      chartType="line"
       refreshInterval={30000}
     />
     <DashboardDepositTile

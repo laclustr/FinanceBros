@@ -1,0 +1,26 @@
+---
+import Layout from '../../layouts/BaseLayout.astro';
+import OnboardTile from '../../components/OnboardingTile.astro';
+import { hasOnboarded } from '../../lib/auth/hasOnboarded';
+
+const { cookies, redirect } = Astro;
+const token = cookies.get('token')?.value;
+
+const [user, onboarded] = await hasOnboarded(token);
+
+if (!user) {
+  return redirect('/login/sign-in');
+}
+
+if (onboarded) {
+  return redirect('/dashboard');
+}
+
+export const prerender = false;
+---
+<Layout>
+  <div class="pt-20 bg-gradient-to-br from-blue-100 to-blue-200">
+    <main class=""/>
+    <OnboardTile />
+  </div>
+</Layout>

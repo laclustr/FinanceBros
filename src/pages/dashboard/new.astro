@@ -1,6 +1,6 @@
 ---
 export const prerender = false;
-import { verifyToken } from '../api/verify-token';
+import { hasOnboarded } from '../../lib/auth/hasOnboarded';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
 import AddEntryTabs from '../../components/DashboardComps/New/NewEntry.astro';
@@ -8,10 +8,13 @@ import AddEntryTabs from '../../components/DashboardComps/New/NewEntry.astro';
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
 
-const user = await verifyToken(token);
+const [user, onboarded] = await hasOnboarded(token);
 
 if (!user) {
   return redirect('/login/sign-in');
+}
+if (!onboarded) {
+  return redirect('/login/onboarding');
 }
 ---
 

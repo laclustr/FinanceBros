@@ -17,8 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
     "types": [
-      "@prisma/client",
-      "vite-pwa/client"
+      "@prisma/client"
     ],
     "jsxImportSource": "react"
   }
