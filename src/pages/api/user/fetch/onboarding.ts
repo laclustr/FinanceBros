@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { verifyToken } from '../../../verify-token.ts'; // adjust path as needed
+import { verifyToken } from '../../verify-token.ts';
 
 const prisma = new PrismaClient();
 
