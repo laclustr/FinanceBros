@@ -13,7 +13,11 @@ export async function POST({ request, cookies }) {
     }
 
     const body = await request.json();
-    const { age, income, employer, creditScore, accounts } = body;
+    let { age, income, employer, creditScore, accounts } = body;
+
+    if (!employer) {
+      employer = 'none';
+    }
 
     if (!age || typeof age !== 'number' || age < 13)
       return new Response(JSON.stringify({ error: 'Invalid age' }), { status: 400 });
@@ -41,8 +45,19 @@ export async function POST({ request, cookies }) {
     await prisma.user.update({
       where: { id: verified.id },
       data: {
-        onboarded: true
-      }
+        onboarded: true,
+        age,
+        income: income,
+        employer,
+        creditScore,
+        bankAccounts: {
+          create: accounts.map(acc => ({
+            name: acc.name,
+            type: acc.type,
+            balance: acc.balance
+          })),
+        },
+      },
     });
 
     return new Response(JSON.stringify({ success: true }), {

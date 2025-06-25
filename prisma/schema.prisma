@@ -13,6 +13,10 @@ model User {
   password    String
   onboarded   Boolean       @default(false)
   createdAt   DateTime      @default(now())
+  age         Int           @default(18)
+  income      String        @default("under-1000")
+  employer    String        @default("none")
+  creditScore Int           @default(850)
 
   bankAccounts BankAccount[]
   purchases   Purchase[]
