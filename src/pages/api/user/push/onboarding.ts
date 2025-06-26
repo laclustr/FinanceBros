@@ -13,7 +13,7 @@ export async function POST({ request, cookies }) {
     }
 
     const body = await request.json();
-    let { age, income, employer, creditScore, accounts } = body;
+    let { age, income, employer, creditScore, accounts, firstName, lastName } = body;
 
     if (!employer) {
       employer = 'none';
@@ -22,7 +22,7 @@ export async function POST({ request, cookies }) {
     if (!age || typeof age !== 'number' || age < 13)
       return new Response(JSON.stringify({ error: 'Invalid age' }), { status: 400 });
 
-    if (!income || typeof income !== 'string')
+    if (!income || typeof income !== 'string' || !['under-1000', '1000-3000', '3000-5000', 'over-5000'].includes(income))
       return new Response(JSON.stringify({ error: 'Invalid income range' }), { status: 400 });
 
     if (creditScore === undefined || typeof creditScore !== 'number' || creditScore < 300 || creditScore > 850)
@@ -46,8 +46,10 @@ export async function POST({ request, cookies }) {
       where: { id: verified.id },
       data: {
         onboarded: true,
+        firstName: firstName,
+        lastName: lastName,
         age,
-        income: income,
+        income,
         employer,
         creditScore,
         bankAccounts: {

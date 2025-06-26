@@ -1,6 +1,5 @@
 ---
 import { Card, CardHeader, CardContent } from "@/components/starwind/card";
-import TabNavigation from './Tabs.astro';
 import PurchaseTab from './PurchaseTab.astro';
 import DepositTab from './IncomeTab.astro';
 import GoalTab from './GoalTab.astro';
@@ -44,18 +43,6 @@ import GoalTab from './GoalTab.astro';
           <span>Goal</span>
         </div>
       </button>
-      <!-- <button
-        class="tab-button flex-1 px-3 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm font-medium text-center border-b-2 border-transparent text-gray-500 hover:text-blue-600 hover:border-blue-300 transition-all duration-200"
-        data-tab="investment"
-      >
-        <div class="flex items-center justify-center gap-1 sm:gap-2">
-          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-          </svg>
-          <span class="hidden sm:inline">Investment</span>
-          <span class="sm:hidden">Invest</span>
-        </div>
-      </button> -->
     </div>
   </CardHeader>
 
@@ -70,8 +57,7 @@ import GoalTab from './GoalTab.astro';
   document.addEventListener('DOMContentLoaded', function() {
     const tabButtons = document.querySelectorAll('.tab-button');
     const tabContents = document.querySelectorAll('.tab-content');
-    
-    // Custom validation messages
+
     const validationMessages = {
       'purchase-title': 'Please enter a purchase title',
       'purchase-amount': 'Please enter a valid amount',
@@ -85,84 +71,81 @@ import GoalTab from './GoalTab.astro';
     };
 
     function switchTab(targetTab) {
-      // Remove active state from all buttons
       tabButtons.forEach(button => {
         button.classList.remove('border-blue-600', 'text-blue-600');
         button.classList.add('border-transparent', 'text-gray-500');
       });
-      
-      // Hide all tab contents
+
       tabContents.forEach(content => {
         content.classList.add('hidden');
       });
-      
-      // Activate the target tab button
+
       const activeButton = document.querySelector(`[data-tab="${targetTab}"]`);
       activeButton.classList.add('border-blue-600', 'text-blue-600');
       activeButton.classList.remove('border-transparent', 'text-gray-500');
-      
-      // Show the target tab content
+
       const activeContent = document.getElementById(`${targetTab}-tab`);
       activeContent.classList.remove('hidden');
     }
-    
-    // Add click event listeners to tab buttons
+
     tabButtons.forEach(button => {
       button.addEventListener('click', function() {
         const targetTab = this.getAttribute('data-tab');
         switchTab(targetTab);
       });
     });
-    
-    // Initialize the first tab as active
+
     switchTab('purchase');
 
-    // Custom validation for all forms
+    // General input formatting and validation (but no form submission handling)
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
       const inputs = form.querySelectorAll('input[type="text"], input[type="number"], input[type="date"]');
       const amountInputs = form.querySelectorAll('input[name="amount"]');
-      
-      // Add comma formatting for amount inputs
+
+      // Amount input formatting
       amountInputs.forEach(input => {
         input.addEventListener('input', function() {
-          let value = this.value.replace(/,/g, ''); // Remove existing commas
-          
-          // Only allow numbers, decimal points, and handle empty values
-          if (value === '' || /^\d*\.?\d*$/.test(value)) {
-            if (value && !isNaN(value) && value !== '.') {
-              // Format with commas but keep cursor position
-              const cursorPosition = this.selectionStart;
-              const beforeCursor = this.value.substring(0, cursorPosition);
-              const commasBefore = (beforeCursor.match(/,/g) || []).length;
-              
-              // Format the number with commas
-              const parts = value.split('.');
-              parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-              const formattedValue = parts.join('.');
-              
-              this.value = formattedValue;
-              
-              // Adjust cursor position for added/removed commas
-              const commasAfter = (formattedValue.substring(0, cursorPosition).match(/,/g) || []).length;
-              const newPosition = cursorPosition + (commasAfter - commasBefore);
-              this.setSelectionRange(newPosition, newPosition);
-            }
-          } else {
-            // If invalid input, restore previous valid value
-            this.value = this.value.slice(0, -1);
+          const raw = this.value;
+          const cursorStart = this.selectionStart;
+          let value = raw.replace(/,/g, '');
+          const validChars = value.match(/^(\d*)(\.?)(\d*)/) || [];
+          let intPart = validChars[1] || '';
+          let dot = validChars[2] || '';
+          let decPart = validChars[3] || '';
+
+          if (decPart.length > 2) {
+            const rounded = Math.round(parseFloat(intPart + '.' + decPart) * 100) / 100;
+            const [newInt, newDec = ''] = rounded.toFixed(2).split('.');
+            intPart = newInt;
+            decPart = newDec;
+            dot = '.';
           }
+
+          const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          let formattedValue = intWithCommas;
+          if (dot) {
+            formattedValue += '.' + decPart;
+          }
+
+          const oldLeft = raw.slice(0, cursorStart);
+          const newLeft = formattedValue.slice(0, cursorStart);
+          const commasBefore = (oldLeft.match(/,/g) || []).length;
+          const commasAfter = (newLeft.match(/,/g) || []).length;
+          const diff = commasAfter - commasBefore;
+
+          this.value = formattedValue;
+          this.setSelectionRange(cursorStart + diff, cursorStart + diff);
         });
       });
-      
-      // Add real-time validation
+
+      // Field validation on blur and input
       inputs.forEach(input => {
         input.addEventListener('blur', function() {
           validateField(this);
         });
-        
+
         input.addEventListener('input', function() {
-          // Clear error when user starts typing (but don't interfere with comma formatting)
           const errorDiv = this.parentNode.querySelector('.error-message');
           if (errorDiv && !this.classList.contains('border-red-500')) {
             errorDiv.classList.add('hidden');
@@ -170,150 +153,110 @@ import GoalTab from './GoalTab.astro';
           }
         });
       });
-      
-      form.addEventListener('submit', function(e) {
+
+      // REMOVED: The conflicting form submission handler that was causing issues
+      // Each tab now handles its own form submission logic independently
+    });
+
+    function validateField(field) {
+      const value = field.value.trim();
+      const errorDiv = field.parentNode.querySelector('.error-message');
+      const fieldId = field.id;
+      let isValid = true;
+      let errorMessage = '';
+
+      if (!value) {
+        isValid = false;
+        errorMessage = validationMessages[fieldId] || 'This field is required';
+      } else if (
+        field.name === 'amount' &&
+        (value === '' || isNaN(value.replace(/,/g, '')) || parseFloat(value.replace(/,/g, '')) <= 0)
+      ) {
+        isValid = false;
+        errorMessage = 'Please enter a valid positive number';
+      } else if (field.type === 'date' && new Date(value) < new Date()) {
+        if (fieldId === 'goal-deadline') {
+          isValid = false;
+          errorMessage = 'Please select a future date';
+        }
+      }
+
+      if (!isValid) {
+        field.classList.add('border-red-500');
+        if (errorDiv) {
+          errorDiv.textContent = errorMessage;
+          errorDiv.classList.remove('hidden');
+        }
+      } else {
+        field.classList.remove('border-red-500');
+        if (errorDiv) {
+          errorDiv.classList.add('hidden');
+        }
+      }
+
+      return isValid;
+    }
+
+    // Keep the investment form handler since it's specific and doesn't conflict
+    const investmentForm = document.getElementById('investment-form');
+
+    if (investmentForm) {
+      investmentForm.addEventListener('submit', async function (e) {
         e.preventDefault();
-        
-        let isValid = true;
-        const submitButton = this.querySelector('button[type="submit"]');
+
+        const inputs = investmentForm.querySelectorAll('input[type="text"], input[type="number"]');
+        const submitButton = investmentForm.querySelector('button[type="submit"]');
         const submitText = submitButton.querySelector('.submit-text');
         const loadingText = submitButton.querySelector('.loading-text');
-        
-        // Validate all required fields
+
+        let isValid = true;
         inputs.forEach(input => {
           if (!validateField(input)) {
             isValid = false;
           }
         });
-        
-        if (isValid) {
-          // Clean up amount fields before submission
-          const amountFields = this.querySelectorAll('input[name="amount"]');
-          amountFields.forEach(field => {
-            if (field.value) {
-              field.value = field.value.replace(/,/g, ''); // Remove commas for server
-            }
+
+        if (!isValid) return;
+
+        const amountField = investmentForm.querySelector('input[name="amount"]');
+        if (amountField && amountField.value) {
+          amountField.value = amountField.value.replace(/,/g, '');
+        }
+
+        submitText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+        submitButton.disabled = true;
+
+        const formData = new FormData(investmentForm);
+
+        try {
+          const response = await fetch(investmentForm.action, {
+            method: 'POST',
+            body: formData,
           });
-          
-          // Show loading state
-          submitText.classList.add('hidden');
-          loadingText.classList.remove('hidden');
-          submitButton.disabled = true;
-          
-          // Submit the form
-          this.submit();
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            window.location.href = '/dashboard';
+          } else {
+            throw new Error(result.error || 'Something went wrong');
+          }
+        } catch (err) {
+          console.error('Submission error:', err);
+          submitText.classList.remove('hidden');
+          loadingText.classList.add('hidden');
+          submitButton.disabled = false;
+
+          const assetInput = investmentForm.querySelector('#investment-asset');
+          const errorDiv = assetInput?.parentNode?.querySelector('.error-message');
+          if (errorDiv) {
+            errorDiv.textContent = err.message;
+            errorDiv.classList.remove('hidden');
+            assetInput.classList.add('border-red-500');
+          }
         }
       });
-    });
-    
-    function validateField(field) {
-  const value = field.value.trim();
-  const errorDiv = field.parentNode.querySelector('.error-message');
-  const fieldId = field.id;
-
-  let isValid = true;
-  let errorMessage = '';
-
-  if (!value) {
-    isValid = false;
-    errorMessage = validationMessages[fieldId] || 'This field is required';
-  } else if (
-    field.name === 'amount' &&
-    (value === '' || isNaN(value.replace(/,/g, '')) || parseFloat(value.replace(/,/g, '')) <= 0)
-  ) {
-    isValid = false;
-    errorMessage = 'Please enter a valid positive number';
-  } else if (field.type === 'date' && new Date(value) < new Date()) {
-    if (fieldId === 'goal-deadline') {
-      isValid = false;
-      errorMessage = 'Please select a future date';
-    }
-  }
-
-  if (!isValid) {
-    field.classList.add('border-red-500');
-    if (errorDiv) {
-      errorDiv.textContent = errorMessage;
-      errorDiv.classList.remove('hidden');
-    } else {
-      console.warn(`No .error-message element found near field ${fieldId}`);
-    }
-  } else {
-    field.classList.remove('border-red-500');
-    if (errorDiv) {
-      errorDiv.classList.add('hidden');
-    }
-  }
-
-  return isValid;
-}
-
-  });
-
-  const investmentForm = document.getElementById('investment-form');
-
-if (investmentForm) {
-  investmentForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    const inputs = investmentForm.querySelectorAll('input[type="text"], input[type="number"]');
-    const submitButton = investmentForm.querySelector('button[type="submit"]');
-    const submitText = submitButton.querySelector('.submit-text');
-    const loadingText = submitButton.querySelector('.loading-text');
-
-    let isValid = true;
-    inputs.forEach(input => {
-      if (!validateField(input)) {
-        isValid = false;
-      }
-    });
-
-    if (!isValid) return;
-
-    // Clean commas from amount
-    const amountField = investmentForm.querySelector('input[name="amount"]');
-    if (amountField && amountField.value) {
-      amountField.value = amountField.value.replace(/,/g, '');
-    }
-
-    // Show loading state
-    submitText.classList.add('hidden');
-    loadingText.classList.remove('hidden');
-    submitButton.disabled = true;
-
-    const formData = new FormData(investmentForm);
-
-    try {
-      const response = await fetch(investmentForm.action, {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        window.location.href = '/dashboard'; // ✅ redirect only on success
-      } else {
-        throw new Error(result.error || 'Something went wrong');
-      }
-    } catch (err) {
-      console.error('Submission error:', err);
-
-      // Restore UI
-      submitText.classList.remove('hidden');
-      loadingText.classList.add('hidden');
-      submitButton.disabled = false;
-
-      // Show error near the asset name field
-      const assetInput = investmentForm.querySelector('#investment-asset');
-      const errorDiv = assetInput?.parentNode?.querySelector('.error-message');
-      if (errorDiv) {
-        errorDiv.textContent = err.message;
-        errorDiv.classList.remove('hidden');
-        assetInput.classList.add('border-red-500');
-      }
     }
   });
-}
-
 </script>

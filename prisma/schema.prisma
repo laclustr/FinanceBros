@@ -8,29 +8,31 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  email       String        @unique
-  password    String
-  onboarded   Boolean       @default(false)
-  createdAt   DateTime      @default(now())
-  age         Int           @default(18)
-  income      String        @default("under-1000")
-  employer    String        @default("none")
-  creditScore Int           @default(850)
+  id            Int           @id @default(autoincrement())
+  firstName     String        @default("")
+  lastName      String        @default("")
+  email         String        @unique
+  password      String
+  onboarded     Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  age           Int           @default(18)
+  income        String        @default("under-1000")
+  employer      String        @default("none")
+  creditScore   Int           @default(850)
+  verifiedEmail Boolean          @default(false)
 
   bankAccounts BankAccount[]
-  purchases   Purchase[]
-  deposits    Deposit[]
-  goals       Goal[]
-  investments Investment[]
+  purchases    Purchase[]
+  deposits     Deposit[]
+  goals        Goal[]
+  investments  Investment[]
 }
 
 model BankAccount {
   id        Int      @id @default(autoincrement())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   name      String
-  type      String   // "checking" or "savings"
+  type      String
   balance   Float
   createdAt DateTime @default(now())
 
@@ -42,8 +44,6 @@ model Purchase {
   id            Int      @id @default(autoincrement())
   userId        Int
   bankAccountId Int
-  user          User     @relation(fields: [userId], references: [id])
-  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
   title         String
   amount        Float
   date          DateTime @default(now())
@@ -53,8 +53,6 @@ model Deposit {
   id            Int      @id @default(autoincrement())
   userId        Int
   bankAccountId Int
-  user          User     @relation(fields: [userId], references: [id])
-  bankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
   title         String
   amount        Float
   date          DateTime @default(now())
@@ -63,7 +61,6 @@ model Deposit {
 model Goal {
   id        Int      @id @default(autoincrement())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   title     String
   target    Float
   progress  Float    @default(0)
@@ -74,7 +71,6 @@ model Goal {
 model Investment {
   id          Int      @id @default(autoincrement())
   userId      Int
-  user        User     @relation(fields: [userId], references: [id])
   assetName   String
   amount      Float
   date        DateTime @default(now())

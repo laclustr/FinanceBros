@@ -4,7 +4,7 @@ import FormField from './FormField.astro';
 ---
 
 <div id="purchase-tab" class="tab-content h-full flex flex-col">
-  <form method="POST" action="/api/user/push/purchases" class="flex-1 flex flex-col" novalidate>
+  <form id="purchase-form" class="flex-1 flex flex-col" novalidate>
     <div class="text-center mb-6 sm:mb-8">
       <div class="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-red-100 rounded-full mb-4">
         <svg class="w-6 h-6 sm:w-8 sm:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,7 +14,17 @@ import FormField from './FormField.astro';
       <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Record a Purchase</h2>
       <p class="text-sm sm:text-base text-gray-600">Track your spending and expenses</p>
     </div>
-    
+
+    <!-- Error/Success Messages -->
+    <div id="form-messages" class="max-w-md mx-auto w-full mb-4">
+      <div id="error-message" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+        <span class="error-text"></span>
+      </div>
+      <div id="success-message" class="hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
+        <span class="success-text"></span>
+      </div>
+    </div>
+
     <div class="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
       <FormField
         id="purchase-title"
@@ -24,7 +34,19 @@ import FormField from './FormField.astro';
         placeholder="e.g., Groceries, Gas, Coffee"
         focusColor="red"
       />
-      
+
+      <div id="account-select-wrapper">
+        <FormField
+          id="purchase-account"
+          name="account"
+          label="Account"
+          type="select"
+          options={['Loading...']}
+          placeholder="Select an account"
+          focusColor="red"
+        />
+      </div>
+
       <FormField
         id="purchase-amount"
         name="amount"
@@ -32,17 +54,161 @@ import FormField from './FormField.astro';
         type="text"
         placeholder="0.00"
         focusColor="red"
-        />
+      />
     </div>
-    
+
     <div class="mt-6 sm:mt-8 max-w-md mx-auto w-full">
       <Button 
         type="submit" 
-        class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm sm:text-base"
+        class="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <span class="submit-text">Add Purchase</span>
         <span class="loading-text hidden">Processing...</span>
       </Button>
     </div>
   </form>
+
+  <script type="module">
+    window.addEventListener("DOMContentLoaded", async () => {
+      // Load account options
+      try {
+        const res = await fetch('/api/user/fetch/accounts', {
+          method: 'POST',
+          credentials: 'include'
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const accounts = data.map(item => item.name);
+          const wrapper = document.getElementById("account-select-wrapper");
+          const selectText = wrapper.querySelector("#purchase-account-selected-text");
+          const selectContent = wrapper.querySelector("[role='listbox']");
+
+          if (selectContent) {
+            selectContent.innerHTML = "";
+
+            accounts.forEach(account => {
+              const item = document.createElement("div");
+              item.className = "cursor-pointer px-4 py-2 hover:bg-gray-100";
+              item.textContent = account;
+              item.addEventListener("click", () => {
+                const input = document.getElementById("purchase-account");
+                const display = document.getElementById("purchase-account-selected-text");
+                input.value = account;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                display.textContent = account;
+              });
+              selectContent.appendChild(item);
+            });
+
+            if (selectText) selectText.textContent = "Select an account";
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load account options:", err);
+      }
+
+      // Handle form submission
+      const form = document.getElementById('purchase-form');
+      const submitButton = form.querySelector('button[type="submit"]');
+      const submitText = submitButton.querySelector('.submit-text');
+      const loadingText = submitButton.querySelector('.loading-text');
+      const errorDiv = document.getElementById('error-message');
+      const successDiv = document.getElementById('success-message');
+      const errorText = errorDiv.querySelector('.error-text');
+      const successText = successDiv.querySelector('.success-text');
+
+      // Debug: Check if elements are found
+      console.log('Form elements found:', {
+        form: !!form,
+        submitButton: !!submitButton,
+        errorDiv: !!errorDiv,
+        successDiv: !!successDiv,
+        errorText: !!errorText,
+        successText: !!successText
+      });
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        console.log('Form submitted'); // Debug
+        
+        // Hide previous messages
+        errorDiv.classList.add('hidden');
+        successDiv.classList.add('hidden');
+        
+        // Show loading state
+        submitButton.disabled = true;
+        submitText.classList.add('hidden');
+        loadingText.classList.remove('hidden');
+
+        try {
+          const formData = new FormData(form);
+          
+          // Debug: Log form data
+          console.log('Form data:', Object.fromEntries(formData));
+          
+          const response = await fetch('/api/user/push/purchases', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+          });
+
+          console.log('Response status:', response.status); // Debug
+          
+          let data;
+          try {
+            data = await response.json();
+            console.log('Response data:', data); // Debug
+          } catch (jsonError) {
+            console.error('Failed to parse JSON response:', jsonError);
+            data = { error: 'Invalid server response' };
+          }
+
+          if (!response.ok) {
+            // Try multiple possible error message properties
+            let errorMessage = data.message || data.error || data.details || 'An error occurred while processing your request';
+            
+            console.log('Showing error:', errorMessage); // Debug
+            
+            errorText.textContent = errorMessage;
+            errorDiv.classList.remove('hidden');
+            
+            // Force visibility for debugging
+            errorDiv.style.display = 'block';
+            
+          } else {
+            // Show success message
+            let successMessage = data.message || data.success || 'Purchase added successfully!';
+            console.log('Showing success:', successMessage); // Debug
+            
+            successText.textContent = successMessage;
+            successDiv.classList.remove('hidden');
+            
+            // Reset form
+            form.reset();
+            
+            // Reset account select display if needed
+            const accountDisplay = document.getElementById("purchase-account-selected-text");
+            if (accountDisplay) accountDisplay.textContent = "Select an account";
+          }
+
+        } catch (error) {
+          console.error('Form submission error:', error);
+          
+          errorText.textContent = 'Network error - please check your connection and try again';
+          errorDiv.classList.remove('hidden');
+          
+          // Force visibility for debugging
+          errorDiv.style.display = 'block';
+          
+        } finally {
+          // Reset loading state
+          submitButton.disabled = false;
+          submitText.classList.remove('hidden');
+          loadingText.classList.add('hidden');
+        }
+      });
+    });
+  </script>
 </div>

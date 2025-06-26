@@ -22,6 +22,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
     </CardHeader>
     <form id="onboardingForm" class="w-full space-y-6" novalidate>
       <CardContent class="space-y-6">
+
+        <div class="flex flex-col gap-1">
+          <Label for="firstName">First Name <span class="text-red-500">*</span></Label>
+          <Input id="firstName" name="firstName" placeholder="e.g. John" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="lastName">Last Name <span class="text-red-500">*</span></Label>
+          <Input id="lastName" name="lastName" placeholder="e.g. Doe" required />
+        </div>
+
         <div class="flex flex-col gap-1">
           <Label for="age">Your Age <span class="text-red-500">*</span></Label>
           <Input id="age" name="age" type="number" inputmode="numeric" placeholder="e.g. 25" required />
@@ -115,23 +126,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
   });
 
   accountsContainer.addEventListener('input', (e) => {
-    if (e.target.matches('.balance-input')) {
-      const input = e.target;
-      const selectionStart = input.selectionStart;
-      const raw = input.value.replace(/[^\d.]/g, '');
-      const parts = raw.split('.');
-      const intPart = parts[0].replace(/^0+(?=\d)/, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      const decimalPart = parts[1] ? '.' + parts[1].slice(0, 2) : '';
-      input.value = intPart + decimalPart;
-      input.setSelectionRange(selectionStart, selectionStart);
-    }
-  });
+  const input = e.target;
+  if (!input.matches('.balance-input')) return;
+
+  const raw = input.value;
+  const cursorStart = input.selectionStart;
+
+  let value = raw.replace(/,/g, '');
+
+  const validChars = value.match(/^(\d*)(\.?)(\d*)/) || [];
+  let intPart = validChars[1] || '';
+  let dot = validChars[2] || '';
+  let decPart = validChars[3] || '';
+
+  if (decPart.length > 2) {
+    const rounded = Math.round(parseFloat(intPart + '.' + decPart) * 100) / 100;
+    const [newInt, newDec = ''] = rounded.toFixed(2).split('.');
+    intPart = newInt;
+    decPart = newDec;
+    dot = '.';
+  }
+
+  const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  let formattedValue = intWithCommas;
+  if (dot) {
+    formattedValue += '.' + decPart;
+  }
+
+  const oldLeft = raw.slice(0, cursorStart);
+  const newLeft = formattedValue.slice(0, cursorStart);
+  const commasBefore = (oldLeft.match(/,/g) || []).length;
+  const commasAfter = (newLeft.match(/,/g) || []).length;
+  const diff = commasAfter - commasBefore;
+
+  input.value = formattedValue;
+  input.setSelectionRange(cursorStart + diff, cursorStart + diff);
+});
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     errorMessage.textContent = '';
 
     const formData = new FormData(form);
+    const firstName = formData.get('firstName')?.trim();
+    const lastName = formData.get('lastName')?.trim();
     const age = parseInt(formData.get('age'));
     const income = formData.get('income');
     const employer = formData.get('employer');
@@ -140,6 +179,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
     const accountNames = formData.getAll('accountName[]');
     const accountTypes = formData.getAll('accountType[]');
     const accountBalances = formData.getAll('accountBalance[]');
+
+    if (!firstName || !lastName) {
+      errorMessage.textContent = 'Please enter your full name';
+      return;
+    }
 
     if (!age || age < 13) {
       errorMessage.textContent = 'Please enter a valid age (13 or older)';
@@ -173,6 +217,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
     }
 
     const payload = {
+      firstName,
+      lastName,
       age,
       income,
       employer,
