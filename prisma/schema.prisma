@@ -8,18 +8,18 @@ datasource db {
 }
 
 model User {
-  id            Int           @id @default(autoincrement())
-  firstName     String        @default("")
-  lastName      String        @default("")
-  email         String        @unique
+  id            Int      @id @default(autoincrement())
+  firstName     String   @default("")
+  lastName      String   @default("")
+  email         String   @unique
   password      String
-  onboarded     Boolean       @default(false)
-  createdAt     DateTime      @default(now())
-  age           Int           @default(18)
-  income        String        @default("under-1000")
-  employer      String        @default("none")
-  creditScore   Int           @default(850)
-  verifiedEmail Boolean          @default(false)
+  onboarded     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  age           Int      @default(18)
+  income        String   @default("under-1000")
+  employer      String   @default("none")
+  creditScore   Int      @default(850)
+  verifiedEmail Boolean  @default(false)
 
   bankAccounts BankAccount[]
   purchases    Purchase[]
@@ -38,24 +38,29 @@ model BankAccount {
 
   purchases Purchase[]
   deposits  Deposit[]
+  User      User       @relation(fields: [userId], references: [id])
 }
 
 model Purchase {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   userId        Int
   bankAccountId Int
   title         String
   amount        Float
-  date          DateTime @default(now())
+  date          DateTime    @default(now())
+  User          User        @relation(fields: [userId], references: [id])
+  BankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
 }
 
 model Deposit {
-  id            Int      @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   userId        Int
   bankAccountId Int
   title         String
   amount        Float
-  date          DateTime @default(now())
+  date          DateTime    @default(now())
+  User          User        @relation(fields: [userId], references: [id])
+  BankAccount   BankAccount @relation(fields: [bankAccountId], references: [id])
 }
 
 model Goal {
@@ -66,12 +71,14 @@ model Goal {
   progress  Float    @default(0)
   deadline  DateTime
   createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model Investment {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  assetName   String
-  amount      Float
-  date        DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  assetName String
+  amount    Float
+  date      DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
 }
