@@ -3,24 +3,16 @@ import { verifyToken } from '../../verify-token.ts';
 
 const prisma = new PrismaClient();
 
-export async function POST({ request, cookies, redirect }) {
+export async function POST({ request, cookies }) {
   try {
     const token = cookies.get('token')?.value;
     const user = await verifyToken(token);
 
-    // Detect if AJAX/JSON request
-    const acceptHeader = request.headers.get('accept');
-    const isAjaxRequest = acceptHeader?.includes('application/json');
-
     if (!user) {
-      if (isAjaxRequest) {
-        return new Response(JSON.stringify({ error: 'Authentication required. Please log in.' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } else {
-        return redirect('/login/sign-in');
-      }
+      return new Response(
+        JSON.stringify({ error: 'Authentication required. Please log in.' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     const form = await request.formData();
@@ -29,23 +21,22 @@ export async function POST({ request, cookies, redirect }) {
     const amountStr = form.get('amount') as string;
 
     if (!title || !accountName || !amountStr) {
-      return new Response(JSON.stringify({ error: 'Missing required fields' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     const cleanAmount = amountStr.replace(/,/g, '');
     const amount = Math.round(parseFloat(cleanAmount) * 100) / 100;
 
     if (isNaN(amount) || amount <= 0) {
-      return new Response(JSON.stringify({ error: 'Amount must be a valid positive number' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Amount must be a valid positive number' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Find the bank account for the user by name
     const bankAccount = await prisma.bankAccount.findFirst({
       where: {
         userId: user.id,
@@ -54,14 +45,14 @@ export async function POST({ request, cookies, redirect }) {
     });
 
     if (!bankAccount) {
-      return new Response(JSON.stringify({ error: 'Bank account not found' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return new Response(
+        JSON.stringify({ error: 'Bank account not found' }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
     await prisma.$transaction([
-      prisma.Deposit.create({
+      prisma.deposit.create({
         data: {
           userId: user.id,
           bankAccountId: bankAccount.id,
@@ -79,14 +70,11 @@ export async function POST({ request, cookies, redirect }) {
       }),
     ]);
 
-    if (isAjaxRequest) {
-      return new Response(
-        JSON.stringify({ success: true, message: 'Deposit added successfully!' }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
-    } else {
-      return redirect('/dashboard');
-    }
+    return new Response(
+      JSON.stringify({ success: true, message: 'Deposit added successfully!' }),
+      { status: 200, headers: { 'Content-Type': 'application/json' } }
+    );
+
   } catch (error) {
     console.error('Error creating deposit:', error);
     return new Response(

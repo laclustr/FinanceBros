@@ -150,6 +150,7 @@ import FormField from './FormField.astro';
             form.reset();
           }
         } catch (error) {
+          // console.error('Error submitting purchase:', error);
           errorText.textContent = 'Network error - please check your connection and try again';
           errorDiv.classList.remove('hidden');
         } finally {

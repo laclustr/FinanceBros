@@ -3,24 +3,17 @@ import { verifyToken } from '../../verify-token.ts';
 
 const prisma = new PrismaClient();
 
-export async function POST({ request, cookies, redirect }) {
+export async function POST({ request, cookies }) {
+  const prisma = new PrismaClient();
   try {
     const token = cookies.get('token')?.value;
     const user = await verifyToken(token);
 
-    // Check if this is an AJAX request
-    const acceptHeader = request.headers.get('accept');
-    const isAjaxRequest = acceptHeader?.includes('application/json');
-
     if (!user) {
-      if (isAjaxRequest) {
-        return new Response(JSON.stringify({ error: 'Authentication required. Please log in.' }), {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      } else {
-        return redirect('/login/sign-in');
-      }
+      return new Response(JSON.stringify({ error: 'Authentication required. Please log in.' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const form = await request.formData();
@@ -67,7 +60,7 @@ export async function POST({ request, cookies, redirect }) {
     }
 
     await prisma.$transaction([
-      prisma.purchase.create({
+      prisma.Purchase.create({
         data: {
           userId: user.id,
           bankAccountId: bankAccount.id,
@@ -85,17 +78,10 @@ export async function POST({ request, cookies, redirect }) {
       }),
     ]);
 
-    if (isAjaxRequest) {
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: 'Purchase added successfully!' 
-      }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    } else {
-      return redirect('/dashboard');
-    }
+    return new Response(JSON.stringify({ success: true, message: 'Purchase added successfully!' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
     console.error('Error creating purchase:', error);

@@ -1,0 +1,82 @@
+---
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/starwind/select";
+
+const clientOnlyId = "account-select-items";
+---
+
+<Select>
+  <SelectTrigger class="w-[180px]">
+    <SelectValue placeholder="All Accounts" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="all" class="text-center" id="all-accounts-item">All Accounts</SelectItem>
+    <div id={clientOnlyId} class="flex flex-col items-center text-center w-full"></div>
+  </SelectContent>
+</Select>
+
+<script type="module" is:client>
+  const mountPoint = document.getElementById('account-select-items');
+  const allAccountsItem = document.getElementById('all-accounts-item');
+
+  if (allAccountsItem) {
+    allAccountsItem.addEventListener('click', () => {
+      const trigger = document.querySelector('[data-slot="trigger"]');
+      trigger?.dispatchEvent(new Event("blur"));
+
+      const event = new CustomEvent('accountSelected', {
+        detail: {
+          id: 'all',
+          name: 'All Accounts',
+        }
+      });
+      window.dispatchEvent(event);
+    });
+  }
+
+  async function fetchAccounts() {
+    try {
+      const res = await fetch('/api/user/fetch/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch accounts');
+
+      const accounts = await res.json();
+
+      for (const account of accounts) {
+        const item = document.createElement('div');
+        item.className = "select-item px-3 py-2 hover:bg-gray-100 cursor-pointer w-full text-center";
+        item.setAttribute('data-value', account.id);
+        item.setAttribute('role', 'option');
+        item.setAttribute('tabindex', '-1');
+        item.textContent = account.name;
+
+        item.addEventListener('click', () => {
+          const trigger = document.querySelector('[data-slot="trigger"]');
+          trigger?.dispatchEvent(new Event("blur"));
+
+          const event = new CustomEvent('accountSelected', {
+            detail: {
+              id: account.id,
+              name: account.name,
+            }
+          });
+          window.dispatchEvent(event);
+        });
+
+        mountPoint?.appendChild(item);
+      }
+    } catch (error) {
+      console.error("Error loading accounts:", error);
+    }
+  }
+
+  fetchAccounts();
+</script>
