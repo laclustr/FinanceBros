@@ -321,3 +321,168 @@ const clientOnlyId = "account-select-items";
     handleScroll();
   });
 </script>
+<script type="module" is:client>
+    let allAccounts = [];
+
+    async function loadAccountsAndUpdateBalance() {
+      try {
+        const res = await fetch('/api/user/fetch/accounts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch accounts');
+
+        allAccounts = await res.json();
+
+        const totalBalance = allAccounts.reduce(
+          (sum, acc) => sum + parseFloat(acc.balance || 0),
+          0
+        );
+
+        // Update both mobile header and desktop integrated balance
+        const event = new CustomEvent('balanceUpdated', {
+          detail: { balance: totalBalance }
+        });
+        window.dispatchEvent(event);
+
+        // Update desktop balance display directly
+        const desktopBalanceDisplay = document.getElementById('desktop-balance-display');
+        if (desktopBalanceDisplay) {
+          desktopBalanceDisplay.textContent = totalBalance.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        }
+
+        // Populate desktop account selector
+        const desktopSelect = document.getElementById('desktop-account-select');
+        if (desktopSelect) {
+          // Clear existing options except "All Accounts"
+          desktopSelect.innerHTML = '<option value="all">All Accounts</option>';
+          
+          allAccounts.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account.id;
+            option.textContent = account.name;
+            desktopSelect.appendChild(option);
+          });
+        }
+
+        // Store current balance globally for header component
+        window.currentBalance = totalBalance;
+
+      } catch (err) {
+        console.error("Failed to load balances", err);
+      }
+    }
+
+    // Desktop collapse functionality
+    const desktopCollapseBtn = document.getElementById('desktop-collapse-btn');
+    const desktopCollapseIcon = document.getElementById('desktop-collapse-icon');
+    const desktopBalanceCard = document.getElementById('desktop-balance-card');
+    const desktopBalanceContent = document.getElementById('desktop-balance-content');
+    
+    if (desktopCollapseBtn && desktopBalanceCard) {
+      desktopCollapseBtn.addEventListener('click', () => {
+        const isCollapsed = desktopBalanceContent.style.display === 'none';
+        
+        if (isCollapsed) {
+          desktopBalanceContent.style.display = 'block';
+          desktopCollapseIcon.style.transform = 'rotate(0deg)';
+          desktopBalanceCard.style.width = '18rem';
+        } else {
+          desktopBalanceContent.style.display = 'none';
+          desktopCollapseIcon.style.transform = 'rotate(180deg)';  
+          desktopBalanceCard.style.width = 'auto';
+        }
+      });
+    }
+
+    // Desktop account selector
+    const desktopSelect = document.getElementById('desktop-account-select');
+    if (desktopSelect) {
+      desktopSelect.addEventListener('change', (e) => {
+        const selectedId = e.target.value;
+        let balance = 0;
+
+        if (selectedId === "all") {
+          balance = allAccounts.reduce(
+            (sum, acc) => sum + parseFloat(acc.balance || 0),
+            0
+          );
+        } else {
+          const selected = allAccounts.find((acc) => acc.id === selectedId);
+          balance = parseFloat(selected?.balance || 0);
+        }
+
+        // Update desktop balance display
+        const desktopBalanceDisplay = document.getElementById('desktop-balance-display');
+        if (desktopBalanceDisplay) {
+          desktopBalanceDisplay.textContent = balance.toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          });
+        }
+
+        // Update mobile header balance
+        const balanceEvent = new CustomEvent('balanceUpdated', {
+          detail: { balance: balance }
+        });
+        window.dispatchEvent(balanceEvent);
+
+        // Store current balance globally
+        window.currentBalance = balance;
+      });
+    }
+
+    // Initial load
+    loadAccountsAndUpdateBalance();
+
+    // Handle mobile account selection (from floating header)
+    window.addEventListener("accountSelected", (event) => {
+      const { id, name } = event.detail;
+
+      let balance = 0;
+
+      if (id === "all") {
+        balance = allAccounts.reduce(
+          (sum, acc) => sum + parseFloat(acc.balance || 0),
+          0
+        );
+      } else {
+        const selected = allAccounts.find((acc) => acc.id === id);
+        balance = parseFloat(selected?.balance || 0);
+      }
+
+      // Update desktop balance display
+      const desktopBalanceDisplay = document.getElementById('desktop-balance-display');
+      if (desktopBalanceDisplay) {
+        desktopBalanceDisplay.textContent = balance.toLocaleString('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      // Update desktop select to match
+      const desktopSelect = document.getElementById('desktop-account-select');
+      if (desktopSelect) {
+        desktopSelect.value = id;
+      }
+
+      // Update mobile header balance
+      const balanceEvent = new CustomEvent('balanceUpdated', {
+        detail: { balance: balance }
+      });
+      window.dispatchEvent(balanceEvent);
+
+      // Store current balance globally
+      window.currentBalance = balance;
+    });
+  </script>

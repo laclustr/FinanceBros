@@ -27,6 +27,7 @@
     "bcryptjs": "^3.0.2",
     "d3": "^7.9.0",
     "jsonwebtoken": "^9.0.2",
+    "lucide": "^0.523.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "recharts": "^2.15.3",

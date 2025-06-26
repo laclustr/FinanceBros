@@ -1,0 +1,333 @@
+---
+import { Dialog, DialogContent } from "@/components/starwind/dialog";
+import { Pagination } from "@/components/starwind/pagination";
+
+const tableId = "transaction-manager-table";
+const ITEMS_PER_PAGE = 20;
+---
+
+<section class="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+  <div class="max-w-screen-xl mx-auto">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Transaction Manager</h1>
+
+    <!-- Filters -->
+    <div class="mb-4 flex flex-wrap items-center gap-2">
+      <div class="hidden md:flex flex-wrap gap-2">
+        <input type="text" id="filter-name" placeholder="Search by name" class="border px-3 py-1 rounded-md text-sm" />
+        <input type="number" id="filter-amount" placeholder="Max amount" class="border px-3 py-1 rounded-md text-sm" />
+        <input type="date" id="filter-date" class="border px-3 py-1 rounded-md text-sm" />
+        <select id="sort-by" class="border px-3 py-1 rounded-md text-sm bg-white">
+          <option value="date-desc">Newest</option>
+          <option value="date-asc">Oldest</option>
+          <option value="amount-desc">Highest</option>
+          <option value="amount-asc">Lowest</option>
+        </select>
+        <button id="clear-filters" class="px-3 py-1 bg-gray-200 rounded-md text-sm">Clear Filters</button>
+      </div>
+
+      <div class="md:hidden relative">
+        <button id="filter-toggle" class="px-3 py-1 border rounded-md">Filters ▼</button>
+        <div id="mobile-filters" class="hidden absolute left-0 mt-2 w-60 bg-white border rounded-md shadow-lg p-4 z-50">
+          <div class="flex flex-col gap-2">
+            <input type="text" id="m-filter-name" placeholder="Name" class="border px-3 py-1 rounded-md text-sm" />
+            <input type="number" id="m-filter-amount" placeholder="Max amount" class="border px-3 py-1 rounded-md text-sm" />
+            <input type="date" id="m-filter-date" class="border px-3 py-1 rounded-md text-sm" />
+            <select id="m-sort-by" class="border px-3 py-1 rounded-md text-sm bg-white">
+              <option value="date-desc">Newest</option>
+              <option value="date-asc">Oldest</option>
+              <option value="amount-desc">Highest</option>
+              <option value="amount-asc">Lowest</option>
+            </select>
+            <div class="flex gap-2">
+              <button id="m-filter-apply" class="flex-1 bg-blue-600 text-white py-1 rounded-md">Apply</button>
+              <button id="m-clear-filters" class="flex-1 bg-gray-200 text-gray-700 py-1 rounded-md">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div id={tableId} class="bg-white rounded-xl shadow overflow-x-auto text-sm">
+      <div class="text-gray-500 p-4">Loading transactions...</div>
+    </div>
+
+    <!-- Pagination -->
+    <div id="pagination-wrapper" class="mt-4 flex justify-center"></div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <Dialog id="delete-dialog">
+    <DialogContent class="max-w-md">
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirm Deletion</h3>
+      <p class="text-sm text-gray-600 mb-4">Delete this transaction?</p>
+      <div class="flex justify-end gap-2">
+        <button id="cancel-delete" class="px-4 py-2 text-sm border rounded-md">Cancel</button>
+        <button id="confirm-delete" class="px-4 py-2 text-sm bg-red-600 text-white rounded-md">Delete</button>
+      </div>
+    </DialogContent>
+  </Dialog>
+
+  <!-- Tooltip for text overflow -->
+  <div id="text-tooltip" class="hidden absolute bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg z-50 max-w-xs break-words"></div>
+
+  <script type="module" define:vars={{ tableId, ITEMS_PER_PAGE }}>
+    const 
+      tableContainer = document.getElementById(tableId),
+      paginationWrapper = document.getElementById("pagination-wrapper"),
+      deleteDialog = document.getElementById("delete-dialog"),
+      filterToggle = document.getElementById("filter-toggle"),
+      mobileFilters = document.getElementById("mobile-filters"),
+      clearBtn = document.getElementById("clear-filters"),
+      mClearBtn = document.getElementById("m-clear-filters"),
+      tooltip = document.getElementById("text-tooltip"),
+      inputs = {
+        name: document.getElementById("filter-name"),
+        amount: document.getElementById("filter-amount"),
+        date: document.getElementById("filter-date"),
+        sort: document.getElementById("sort-by"),
+        mName: document.getElementById("m-filter-name"),
+        mAmount: document.getElementById("m-filter-amount"),
+        mDate: document.getElementById("m-filter-date"),
+        mSort: document.getElementById("m-sort-by"),
+        mApply: document.getElementById("m-filter-apply"),
+      };
+
+    let transactions = [], currentPage = 1, deleteTargetId = null;
+
+    // Toggle mobile filter dropdown
+    filterToggle.addEventListener("click", () => mobileFilters.classList.toggle("hidden"));
+
+    // Tooltip functionality
+    function showTooltip(element, text, event) {
+      tooltip.textContent = text;
+      tooltip.classList.remove("hidden");
+      
+      const rect = element.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      
+      let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
+      let top = rect.top - tooltipRect.height - 5;
+      
+      // Adjust if tooltip goes off screen
+      if (left < 0) left = 5;
+      if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 5;
+      if (top < 0) top = rect.bottom + 5;
+      
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    }
+
+    function hideTooltip() {
+      tooltip.classList.add("hidden");
+    }
+
+    function truncateText(text, maxLength = 20) {
+      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    }
+
+    function clearAllFilters() {
+      inputs.name.value = "";
+      inputs.amount.value = "";
+      inputs.date.value = "";
+      inputs.sort.value = "date-desc";
+    }
+
+    clearBtn.addEventListener("click", () => { clearAllFilters(); refresh(); });
+    mClearBtn.addEventListener("click", () => {
+      clearAllFilters();
+      inputs.mName.value = "";
+      inputs.mAmount.value = "";
+      inputs.mDate.value = "";
+      inputs.mSort.value = "date-desc";
+      mobileFilters.classList.add("hidden");
+      refresh();
+    });
+
+    inputs.mApply.addEventListener("click", () => {
+      inputs.name.value = inputs.mName.value;
+      inputs.amount.value = inputs.mAmount.value;
+      inputs.date.value = inputs.mDate.value;
+      inputs.sort.value = inputs.mSort.value;
+      mobileFilters.classList.add("hidden");
+      refresh();
+    });
+
+    // Delete dialog handlers
+    document.getElementById("cancel-delete").onclick = () => deleteDialog.close();
+    document.getElementById("confirm-delete").onclick = async () => {
+      if (!deleteTargetId) return;
+      await fetch(`/api/user/delete/transaction/${deleteTargetId}`, { method: "DELETE" });
+      deleteTargetId = null;
+      deleteDialog.close();
+      refresh();
+    };
+
+    function formatDateString(d) {
+      const dt = new Date(d);
+      return dt.toLocaleDateString();
+    }
+
+    function applyFilters(arr) {
+      return arr.filter(t => {
+        const matchName = t.title.toLowerCase().includes(inputs.name.value.trim().toLowerCase());
+        const matchAmount = !inputs.amount.value || Math.abs(t.amount) <= +inputs.amount.value;
+        const matchDate = !inputs.date.value
+          || new Date(t.date).toISOString().slice(0,10) === inputs.date.value;
+        return matchName && matchAmount && matchDate;
+      });
+    }
+
+    function applySort(arr) {
+      return arr.sort((a, b) => {
+        switch (inputs.sort.value) {
+          case "date-asc": return new Date(a.date) - new Date(b.date);
+          case "amount-desc": return b.amount - a.amount;
+          case "amount-asc": return a.amount - b.amount;
+          default: return new Date(b.date) - new Date(a.date);
+        }
+      });
+    }
+
+    function renderPagination(totalPages) {
+      paginationWrapper.innerHTML = "";
+      const p = document.createElement("pagination-control");
+      p.setAttribute("page-count", totalPages);
+      p.setAttribute("current-page", currentPage);
+      p.addEventListener("page-change", e => {
+        currentPage = +e.detail;
+        renderTable();
+      });
+      paginationWrapper.append(p);
+    }
+
+    function renderTable() {
+      const list = applySort(applyFilters([...transactions]));
+      const paged = list.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE);
+
+      // No data
+      if (!list.length) {
+        tableContainer.innerHTML = '<div class="p-4 text-gray-500">No transactions found.</div>';
+        paginationWrapper.innerHTML = "";
+        return;
+      }
+
+      renderPagination(Math.ceil(list.length / ITEMS_PER_PAGE));
+
+      const table = document.createElement("table");
+      table.className = "w-full table-fixed text-sm border-collapse";
+      table.innerHTML = `
+        <thead class="bg-gray-100 text-gray-700">
+          <tr>
+            <th class="w-2/5 px-4 py-2 text-left">Title</th>
+            <th class="w-1/5 px-4 py-2 text-left">Amount</th>
+            <th class="w-1/5 px-4 py-2 text-left">Date</th>
+            <th class="hidden md:table-cell w-1/6 px-4 py-2 text-left">Type</th>
+            <th class="w-12 px-4 py-2"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white"></tbody>
+      `;
+      const tb = table.querySelector("tbody");
+
+      list.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE).forEach(t => {
+        const isDep = t.type === "deposit";
+        const clr = isDep ? "text-green-600" : "text-red-600";
+        
+        // Mobile-specific truncation
+        const isMobile = window.innerWidth < 768; // md breakpoint
+        const maxLength = isMobile ? 15 : 35;
+        const truncatedTitle = truncateText(t.title, maxLength);
+        const showTitleTooltip = t.title.length > maxLength;
+        
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="px-4 py-2">
+            <span class="truncate-text ${showTitleTooltip ? 'cursor-pointer hover:text-blue-600' : ''}" 
+                  ${showTitleTooltip ? `data-full-text="${t.title}"` : ''}>${truncatedTitle}</span>
+          </td>
+          <td class="px-4 py-2 font-semibold ${clr}">${Math.abs(t.amount).toFixed(2)}</td>
+          <td class="px-4 py-2 text-gray-500">${formatDateString(t.date)}</td>
+          <td class="hidden md:table-cell px-4 py-2 text-gray-500 text-left">${isDep ? "Deposit" : "Purchase"}</td>
+          <td class="px-4 py-2 text-right relative">
+            <button class="menu-btn text-gray-500 hover:text-gray-700" data-id="${t.id}">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+              </svg>
+            </button>
+            <div class="dropdown hidden absolute right-0 mt-2 w-28 bg-white border rounded shadow-lg z-50">
+              <div class="px-2 py-1 hover:bg-gray-100 cursor-pointer edit-item" data-id="${t.id}">Edit</div>
+              <div class="px-2 py-1 hover:bg-red-100 text-red-600 cursor-pointer delete-item" data-id="${t.id}">Delete</div>
+            </div>
+          </td>
+        `;
+        tb.append(tr);
+      });
+
+      tableContainer.innerHTML = "";
+      tableContainer.append(table);
+
+      // Menu button events
+      document.querySelectorAll(".menu-btn").forEach(btn =>
+        btn.onclick = e => {
+          e.stopPropagation();
+          document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+          btn.nextElementSibling.classList.toggle("hidden");
+        });
+
+      document.querySelectorAll(".delete-item").forEach(btn =>
+        btn.onclick = e => {
+          e.stopPropagation();
+          deleteTargetId = btn.dataset.id;
+          deleteDialog.showModal();
+        });
+
+      // Tooltip events for truncated text
+      document.querySelectorAll(".truncate-text[data-full-text]").forEach(span => {
+        span.addEventListener("click", e => {
+          e.stopPropagation();
+          showTooltip(span, span.dataset.fullText, e);
+        });
+      });
+
+      document.body.addEventListener("click", () => {
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
+        hideTooltip();
+      });
+    }
+
+    async function refresh() {
+      currentPage = 1;
+      await fetchTransactions();
+    }
+
+    async function fetchTransactions() {
+      try {
+        const now = new Date(), start = new Date(now);
+        start.setMonth(start.getMonth() - 1);
+
+        const body = JSON.stringify({ startDate: start.toISOString(), endDate: now.toISOString() });
+        const headers = { "Content-Type": "application/json" };
+        const [p, d] = await Promise.all([
+          fetch("/api/user/fetch/purchases", { method:"POST", headers, body }).then(r => r.json()),
+          fetch("/api/user/fetch/deposits", { method:"POST", headers, body }).then(r => r.json())
+        ]);
+        transactions = [
+          ...p.map(x => ({ ...x, type: "purchase" })),
+          ...d.map(x => ({ ...x, type: "deposit" }))
+        ];
+        renderTable();
+      } catch (err) {
+        console.error(err);
+        tableContainer.innerHTML = '<div class="p-4 text-red-600">Failed to load.</div>';
+      }
+    }
+
+    inputs.name.addEventListener("input", refresh);
+    inputs.amount.addEventListener("input", refresh);
+    inputs.date.addEventListener("change", refresh);
+    inputs.sort.addEventListener("change", refresh);
+
+    fetchTransactions();
+  </script>
+</section>

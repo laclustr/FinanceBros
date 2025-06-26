@@ -4,6 +4,7 @@ import { hasOnboarded } from '../../lib/auth/hasOnboarded';
 import Layout from '../../layouts/DashboardLayout.astro';
 import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
 import Header from '../../components/DashboardComps/Header.astro';
+import TransactionBoard from '../../components/DashboardComps/Transactions/Transactions.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -22,5 +23,6 @@ if (!onboarded) {
 <Layout title="Purchases">
   <main class="pt-20"/>
   <Header />
+  <TransactionBoard />
   <DashboardNav />
 </Layout>
