@@ -16,7 +16,7 @@ type Props = HTMLAttributes<"div"> & {
 
 const selectItem = tv({
 	base: [
-		"relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-2 pl-8 outline-none select-none",
+		"relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-2 pl-2 outline-none select-none",
 		"focus:bg-accent focus:text-accent-foreground",
 		"data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
 		"not-aria-selected:[&_svg]:hidden aria-selected:[&_svg]:flex",
@@ -37,9 +37,9 @@ const { class: className, value, disabled, ...rest } = Astro.props;
 	tabindex="0"
 	{...rest}
 >
-	<span class={selectItemIcon()}>
+	<!-- <span class={selectItemIcon()}>
 		<Check class="size-4" />
-	</span>
+	</span> -->
 	<span>
 		<slot />
 	</span>
