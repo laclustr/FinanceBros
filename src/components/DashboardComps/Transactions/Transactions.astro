@@ -6,41 +6,45 @@ const tableId = "transaction-manager-table";
 const ITEMS_PER_PAGE = 20;
 ---
 
-<section class="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+<section class="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 pt-1 sm:pt-1 md:pt-1">
   <div class="max-w-screen-xl mx-auto">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Transaction Manager</h1>
 
     <!-- Filters -->
     <div class="mb-4 flex flex-wrap items-center gap-2">
       <div class="hidden md:flex flex-wrap gap-2">
-        <input type="text" id="filter-name" placeholder="Search by name" class="border px-3 py-1 rounded-md text-sm" />
-        <input type="number" id="filter-amount" placeholder="Max amount" class="border px-3 py-1 rounded-md text-sm" />
-        <input type="date" id="filter-date" class="border px-3 py-1 rounded-md text-sm" />
-        <select id="sort-by" class="border px-3 py-1 rounded-md text-sm bg-white">
+        <input type="text" id="filter-name" placeholder="Search by name" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+        <input type="number" id="filter-amount" placeholder="Max amount" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+        <input type="date" id="filter-date" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+        <select id="sort-by" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm">
           <option value="date-desc">Newest</option>
           <option value="date-asc">Oldest</option>
           <option value="amount-desc">Highest</option>
           <option value="amount-asc">Lowest</option>
         </select>
-        <button id="clear-filters" class="px-3 py-1 bg-gray-200 rounded-md text-sm">Clear Filters</button>
+        <button id="clear-filters" class="h-9 px-3 bg-gray-200 rounded-md text-sm hover:bg-gray-300 transition-colors duration-200">Clear Filters</button>
       </div>
 
-      <div class="md:hidden relative">
-        <button id="filter-toggle" class="px-3 py-1 border rounded-md">Filters ▼</button>
-        <div id="mobile-filters" class="hidden absolute left-0 mt-2 w-60 bg-white border rounded-md shadow-lg p-4 z-50">
-          <div class="flex flex-col gap-2">
-            <input type="text" id="m-filter-name" placeholder="Name" class="border px-3 py-1 rounded-md text-sm" />
-            <input type="number" id="m-filter-amount" placeholder="Max amount" class="border px-3 py-1 rounded-md text-sm" />
-            <input type="date" id="m-filter-date" class="border px-3 py-1 rounded-md text-sm" />
-            <select id="m-sort-by" class="border px-3 py-1 rounded-md text-sm bg-white">
+      <div class="md:hidden relative w-full">
+        <button id="filter-toggle" class="h-9 px-3 text-sm border border-gray-300 rounded-md bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm w-full text-left flex justify-between items-center">
+          <span>Filters</span>
+          <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <div id="mobile-filters" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg p-4 z-50">
+          <div class="flex flex-col gap-3">
+            <input type="text" id="m-filter-name" placeholder="Search by name" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+            <input type="number" id="m-filter-amount" placeholder="Max amount" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+            <input type="date" id="m-filter-date" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
+            <select id="m-sort-by" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm">
               <option value="date-desc">Newest</option>
               <option value="date-asc">Oldest</option>
               <option value="amount-desc">Highest</option>
               <option value="amount-asc">Lowest</option>
             </select>
-            <div class="flex gap-2">
-              <button id="m-filter-apply" class="flex-1 bg-blue-600 text-white py-1 rounded-md">Apply</button>
-              <button id="m-clear-filters" class="flex-1 bg-gray-200 text-gray-700 py-1 rounded-md">Clear</button>
+            <div class="flex gap-2 mt-2">
+              <button id="m-filter-apply" class="flex-1 h-9 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">Apply</button>
+              <button id="m-clear-filters" class="flex-1 h-9 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200">Clear</button>
             </div>
           </div>
         </div>
@@ -93,10 +97,79 @@ const ITEMS_PER_PAGE = 20;
         mApply: document.getElementById("m-filter-apply"),
       };
 
-    let transactions = [], currentPage = 1, deleteTargetId = null;
+    let transactions = [], allTransactions = [], currentPage = 1, deleteTargetId = null;
+    let currentAccountId = 'all'; // Track current selected account
+
+    // Listen for account changes from the balance component
+    function handleAccountChange() {
+      // Check if there's a global account selector
+      const accountSelect = document.getElementById('account-select');
+      if (accountSelect) {
+        currentAccountId = accountSelect.value;
+        console.log('Account changed to:', currentAccountId);
+        filterTransactionsByAccount();
+        renderTable();
+      }
+    }
+
+    // Set up account change listener
+    function setupAccountListener() {
+      const accountSelect = document.getElementById('account-select');
+      if (accountSelect) {
+        accountSelect.addEventListener('change', handleAccountChange);
+        currentAccountId = accountSelect.value || 'all';
+      }
+      
+      // Listen for custom events from the balance component
+      window.addEventListener('accountChanged', (e) => {
+        currentAccountId = e.detail.accountId || 'all';
+        console.log('Account changed via event to:', currentAccountId);
+        filterTransactionsByAccount();
+        renderTable();
+      });
+    }
+
+    // Filter transactions based on selected account
+    function filterTransactionsByAccount() {
+      if (currentAccountId === 'all') {
+        transactions = [...allTransactions];
+      } else {
+        transactions = allTransactions.filter(t => {
+          // Check the correct field name based on your schema
+          // Your schema uses 'bankAccountId' for both Purchase and Deposit models
+          const transactionAccountId = t.bankAccountId || t.account_id || t.accountId;
+          const matches = String(transactionAccountId) === String(currentAccountId);
+          
+          // Debug logging for first few mismatches
+          if (!matches && allTransactions.indexOf(t) < 5) {
+            console.log(`Transaction ${t.id} account ID: ${transactionAccountId} (type: ${typeof transactionAccountId}) vs selected: ${currentAccountId} (type: ${typeof currentAccountId})`);
+          }
+          
+          return matches;
+        });
+      }
+      
+      console.log(`Filtered transactions for account ${currentAccountId}:`, transactions.length, 'of', allTransactions.length);
+      if (transactions.length > 0) {
+        console.log('Sample filtered transaction:', transactions[0]);
+      }
+    }
 
     // Toggle mobile filter dropdown
-    filterToggle.addEventListener("click", () => mobileFilters.classList.toggle("hidden"));
+    filterToggle.addEventListener("click", () => {
+      mobileFilters.classList.toggle("hidden");
+      const arrow = filterToggle.querySelector("svg");
+      arrow.style.transform = mobileFilters.classList.contains("hidden") ? "rotate(0deg)" : "rotate(180deg)";
+    });
+
+    // Close mobile filters when clicking outside
+    document.addEventListener("click", (e) => {
+      if (!mobileFilters.contains(e.target) && !filterToggle.contains(e.target)) {
+        mobileFilters.classList.add("hidden");
+        const arrow = filterToggle.querySelector("svg");
+        arrow.style.transform = "rotate(0deg)";
+      }
+    });
 
     // Tooltip functionality
     function showTooltip(element, text, event) {
@@ -150,6 +223,8 @@ const ITEMS_PER_PAGE = 20;
       inputs.date.value = inputs.mDate.value;
       inputs.sort.value = inputs.mSort.value;
       mobileFilters.classList.add("hidden");
+      const arrow = filterToggle.querySelector("svg");
+      arrow.style.transform = "rotate(0deg)";
       refresh();
     });
 
@@ -207,7 +282,10 @@ const ITEMS_PER_PAGE = 20;
 
       // No data
       if (!list.length) {
-        tableContainer.innerHTML = '<div class="p-4 text-gray-500">No transactions found.</div>';
+        const message = currentAccountId === 'all' 
+          ? 'No transactions found.' 
+          : `No transactions found for selected account.`;
+        tableContainer.innerHTML = `<div class="p-4 text-gray-500">${message}</div>`;
         paginationWrapper.innerHTML = "";
         return;
       }
@@ -312,10 +390,22 @@ const ITEMS_PER_PAGE = 20;
           fetch("/api/user/fetch/purchases", { method:"POST", headers, body }).then(r => r.json()),
           fetch("/api/user/fetch/deposits", { method:"POST", headers, body }).then(r => r.json())
         ]);
-        transactions = [
+        
+        // Store all transactions
+        allTransactions = [
           ...p.map(x => ({ ...x, type: "purchase" })),
           ...d.map(x => ({ ...x, type: "deposit" }))
         ];
+        
+        console.log('Fetched transactions:', allTransactions.length);
+        if (allTransactions.length > 0) {
+          console.log('Sample transaction with all fields:', allTransactions[0]);
+          console.log('Transaction field names:', Object.keys(allTransactions[0]));
+          console.log('Bank account IDs found:', [...new Set(allTransactions.map(t => t.bankAccountId || t.account_id || t.accountId))]);
+        }
+        
+        // Filter by current account
+        filterTransactionsByAccount();
         renderTable();
       } catch (err) {
         console.error(err);
@@ -323,11 +413,25 @@ const ITEMS_PER_PAGE = 20;
       }
     }
 
-    inputs.name.addEventListener("input", refresh);
-    inputs.amount.addEventListener("input", refresh);
-    inputs.date.addEventListener("change", refresh);
-    inputs.sort.addEventListener("change", refresh);
+    inputs.name.addEventListener("input", () => {
+      currentPage = 1;
+      renderTable();
+    });
+    inputs.amount.addEventListener("input", () => {
+      currentPage = 1;
+      renderTable();
+    });
+    inputs.date.addEventListener("change", () => {
+      currentPage = 1;
+      renderTable();
+    });
+    inputs.sort.addEventListener("change", () => {
+      currentPage = 1;
+      renderTable();
+    });
 
+    // Initialize
+    setupAccountListener();
     fetchTransactions();
   </script>
 </section>
