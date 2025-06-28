@@ -3,11 +3,11 @@ const tableId = "transaction-manager-table";
 const ITEMS_PER_PAGE = 20;
 ---
 
-<section id="transaction-section" class="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 pt-2 sm:pt-1 md:pt-1 transition-all duration-300">
+<section id="transaction-section" class="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 pt-0 sm:pt-0 md:pt-0 transition-all duration-300">
   <div class="max-w-screen-xl mx-auto">
 
     <!-- Filters -->
-    <div class="mb-6 relative">
+    <div class="mb-2 relative">
       <!-- Mobile Filter Toggle -->
       <button id="filter-toggle-button" class="md:hidden h-10 px-4 w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L13 10.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-6.586L4.293 6.707A1 1 0 014 6V3z" clip-rule="evenodd" /></svg>
@@ -15,7 +15,7 @@ const ITEMS_PER_PAGE = 20;
       </button>
 
       <!-- Filter Controls -->
-      <div id="filter-controls" class="hidden absolute z-10 left-0 right-0 mt-2 md:static md:flex md:flex-wrap md:items-end md:gap-x-4 md:gap-y-2 bg-white md:bg-transparent p-4 md:p-0 rounded-lg border md:border-none shadow-lg md:shadow-none">
+      <div id="filter-controls" class="hidden absolute z-10 left-0 right-0 mt-2 md:static md:flex md:flex-wrap md:items-end md:gap-x-4 md:gap-y-2 bg-white md:bg-transparent p-4 md:p-0 pb-2 rounded-lg border md:border-none shadow-lg md:shadow-none">
           <div class="w-full md:w-auto">
               <label for="filter-name" class="block text-sm font-medium text-gray-700 mb-1">Search by name</label>
               <input type="text" id="filter-name" class="h-9 w-full text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
@@ -281,7 +281,7 @@ const ITEMS_PER_PAGE = 20;
       
       if (isMobile) {
         elements.tableContainer.className = "bg-transparent shadow-none";
-        elements.tableContainer.innerHTML = `<div class="p-2 sm:p-0">${tableContent}</div>`;
+        elements.tableContainer.innerHTML = `<div class="p-0 sm:p-0">${tableContent}</div>`;
       } else {
         elements.tableContainer.className = "bg-white rounded-xl shadow text-sm mb-6 relative";
         elements.tableContainer.innerHTML = `
