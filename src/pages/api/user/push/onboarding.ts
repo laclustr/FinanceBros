@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { verifyToken } from '../../verify-token.ts';
+import { createAccounts } from './accounts.ts'
 
 const prisma = new PrismaClient();
 
@@ -31,17 +32,6 @@ export async function POST({ request, cookies }) {
     if (!Array.isArray(accounts) || accounts.length === 0)
       return new Response(JSON.stringify({ error: 'At least one bank account is required' }), { status: 400 });
 
-    for (const acc of accounts) {
-      if (!acc.name || typeof acc.name !== 'string')
-        return new Response(JSON.stringify({ error: 'Each account must have a name' }), { status: 400 });
-
-      if (!acc.type || !['checking', 'savings'].includes(acc.type))
-        return new Response(JSON.stringify({ error: 'Each account must be either checking or savings' }), { status: 400 });
-
-      if (typeof acc.balance !== 'number' || acc.balance <= 0)
-        return new Response(JSON.stringify({ error: 'Each account must have a valid positive balance' }), { status: 400 });
-    }
-
     await prisma.user.update({
       where: { id: verified.id },
       data: {
@@ -52,15 +42,10 @@ export async function POST({ request, cookies }) {
         income,
         employer,
         creditScore,
-        bankAccounts: {
-          create: accounts.map(acc => ({
-            name: acc.name,
-            type: acc.type,
-            balance: acc.balance
-          })),
-        },
       },
     });
+
+    await createAccounts(verified.id, accounts);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,

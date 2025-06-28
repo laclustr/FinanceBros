@@ -1,389 +1,206 @@
 ---
-import { Dialog, DialogContent } from "@/components/starwind/dialog";
-import { Pagination } from "@/components/starwind/pagination";
-
 const tableId = "transaction-manager-table";
 const ITEMS_PER_PAGE = 20;
 ---
 
-<section class="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8 pt-1 sm:pt-1 md:pt-1">
+<section id="transaction-section" class="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 pt-2 sm:pt-1 md:pt-1 transition-all duration-300">
   <div class="max-w-screen-xl mx-auto">
 
     <!-- Filters -->
-    <div class="mb-4 flex flex-wrap items-center gap-2">
-      <div class="hidden md:flex flex-wrap gap-2">
-        <input type="text" id="filter-name" placeholder="Search by name" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-        <input type="number" id="filter-amount" placeholder="Max amount" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-        <input type="date" id="filter-date" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-        <select id="sort-by" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm">
-          <option value="date-desc">Newest</option>
-          <option value="date-asc">Oldest</option>
-          <option value="amount-desc">Highest</option>
-          <option value="amount-asc">Lowest</option>
-        </select>
-        <button id="clear-filters" class="h-9 px-3 bg-gray-200 rounded-md text-sm hover:bg-gray-300 transition-colors duration-200">Clear Filters</button>
-      </div>
+    <div class="mb-6 relative">
+      <!-- Mobile Filter Toggle -->
+      <button id="filter-toggle-button" class="md:hidden h-10 px-4 w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L13 10.414V15a1 1 0 01-.293.707l-2 2A1 1 0 019 17v-6.586L4.293 6.707A1 1 0 014 6V3z" clip-rule="evenodd" /></svg>
+        <span>Filters</span>
+      </button>
 
-      <div class="md:hidden relative w-full">
-        <button id="filter-toggle" class="h-9 px-3 text-sm border border-gray-300 rounded-md bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm w-full text-left flex justify-between items-center">
-          <span>Filters</span>
-          <svg class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </button>
-        <div id="mobile-filters" class="hidden absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg p-4 z-50">
-          <div class="flex flex-col gap-3">
-            <input type="text" id="m-filter-name" placeholder="Search by name" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-            <input type="number" id="m-filter-amount" placeholder="Max amount" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-            <input type="date" id="m-filter-date" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm" />
-            <select id="m-sort-by" class="h-9 text-sm border border-gray-300 rounded-md px-3 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm">
-              <option value="date-desc">Newest</option>
-              <option value="date-asc">Oldest</option>
-              <option value="amount-desc">Highest</option>
-              <option value="amount-asc">Lowest</option>
-            </select>
-            <div class="flex gap-2 mt-2">
-              <button id="m-filter-apply" class="flex-1 h-9 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200">Apply</button>
-              <button id="m-clear-filters" class="flex-1 h-9 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors duration-200">Clear</button>
-            </div>
+      <!-- Filter Controls -->
+      <div id="filter-controls" class="hidden absolute z-10 left-0 right-0 mt-2 md:static md:flex md:flex-wrap md:items-end md:gap-x-4 md:gap-y-2 bg-white md:bg-transparent p-4 md:p-0 rounded-lg border md:border-none shadow-lg md:shadow-none">
+          <div class="w-full md:w-auto">
+              <label for="filter-name" class="block text-sm font-medium text-gray-700 mb-1">Search by name</label>
+              <input type="text" id="filter-name" class="h-9 w-full text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
           </div>
-        </div>
+          <div class="w-full md:w-auto">
+              <label for="filter-type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <select id="filter-type" class="h-9 w-full text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="all">All</option>
+                  <option value="purchase">Purchase</option>
+                  <option value="deposit">Deposit</option>
+              </select>
+          </div>
+          <div class="w-full md:w-auto">
+              <label for="filter-amount" class="block text-sm font-medium text-gray-700 mb-1">Max amount</label>
+              <input type="number" id="filter-amount" class="h-9 w-full text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div class="w-full md:w-auto">
+              <label for="filter-date" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+              <input type="date" id="filter-date" class="h-9 w-full text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+          </div>
+          <div class="w-full md:w-auto">
+              <label for="sort-by" class="block text-sm font-medium text-gray-700 mb-1">Sort by</label>
+              <select id="sort-by" class="h-9 w-28 text-sm border border-gray-300 rounded-md px-3 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <option value="date-desc">Newest</option>
+                  <option value="date-asc">Oldest</option>
+                  <option value="amount-desc">Highest</option>
+                  <option value="amount-asc">Lowest</option>
+              </select>
+          </div>
+          <div class="flex items-center gap-2 mt-4 md:mt-0 w-full md:w-auto">
+               <button id="clear-filters" class="h-9 w-1/2 md:w-auto px-4 bg-gray-200 rounded-md text-sm hover:bg-gray-300 transition-colors duration-200">Clear</button>
+               <button id="apply-filters" class="h-9 w-1/2 md:w-auto px-4 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition-colors duration-200">Apply</button>
+          </div>
       </div>
     </div>
 
+
     <!-- Table -->
-    <div id={tableId} class="bg-white rounded-xl shadow overflow-x-auto text-sm">
+    <div id={tableId} class="bg-white rounded-xl shadow text-sm mb-6 relative">
       <div class="text-gray-500 p-4">Loading transactions...</div>
     </div>
 
     <!-- Pagination -->
-    <div id="pagination-wrapper" class="mt-4 flex justify-center"></div>
+    <nav id="pagination-wrapper" class="flex justify-center pb-4"></nav>
   </div>
 
-  <!-- Delete Confirmation Dialog -->
-  <Dialog id="delete-dialog">
-    <DialogContent class="max-w-md">
-      <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirm Deletion</h3>
-      <p class="text-sm text-gray-600 mb-4">Delete this transaction?</p>
-      <div class="flex justify-end gap-2">
-        <button id="cancel-delete" class="px-4 py-2 text-sm border rounded-md">Cancel</button>
-        <button id="confirm-delete" class="px-4 py-2 text-sm bg-red-600 text-white rounded-md">Delete</button>
+  <!-- Edit Modal -->
+  <div id="edit-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div class="p-4 border-b">
+        <h3 class="text-lg font-medium">Edit Transaction</h3>
       </div>
-    </DialogContent>
-  </Dialog>
+      <form id="edit-form">
+        <div class="p-6">
+            <input type="hidden" id="edit-id" />
+            <input type="hidden" id="edit-type" />
+            <div class="grid gap-5">
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-title" class="text-right text-sm font-medium">Title</label>
+                <input id="edit-title" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-amount" class="text-right text-sm font-medium">Amount</label>
+                <input id="edit-amount" type="text" placeholder="0.00" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-date" class="text-right text-sm font-medium">Date</label>
+                <input id="edit-date" type="date" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end gap-2">
+          <button type="button" id="cancel-edit" class="px-4 py-2 text-sm border rounded-md hover:bg-gray-100">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-  <!-- Tooltip for text overflow -->
-  <div id="text-tooltip" class="hidden absolute bg-gray-800 text-white text-xs px-2 py-1 rounded shadow-lg z-50 max-w-xs break-words"></div>
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+       <div class="p-4 border-b">
+        <h3 class="text-lg font-medium">Confirm Deletion</h3>
+      </div>
+      <div class="p-6">
+        <p class="text-sm text-gray-600">Are you sure you want to delete this transaction? This action cannot be undone.</p>
+      </div>
+      <div class="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end gap-2">
+        <button id="cancel-delete" class="px-4 py-2 text-sm border rounded-md hover:bg-gray-100">Cancel</button>
+        <button id="confirm-delete" class="px-4 py-2 text-sm bg-red-600 text-white rounded-md hover:bg-red-700">Delete</button>
+      </div>
+    </div>
+  </div>
 
   <script type="module" define:vars={{ tableId, ITEMS_PER_PAGE }}>
-    const 
-      tableContainer = document.getElementById(tableId),
-      paginationWrapper = document.getElementById("pagination-wrapper"),
-      deleteDialog = document.getElementById("delete-dialog"),
-      filterToggle = document.getElementById("filter-toggle"),
-      mobileFilters = document.getElementById("mobile-filters"),
-      clearBtn = document.getElementById("clear-filters"),
-      mClearBtn = document.getElementById("m-clear-filters"),
-      tooltip = document.getElementById("text-tooltip"),
-      inputs = {
+    // --- ELEMENT SELECTORS ---
+    const elements = {
+      section: document.getElementById("transaction-section"),
+      tableContainer: document.getElementById(tableId),
+      paginationWrapper: document.getElementById("pagination-wrapper"),
+      editModal: {
+        modal: document.getElementById("edit-modal"),
+        form: document.getElementById("edit-form"),
+        id: document.getElementById("edit-id"),
+        type: document.getElementById("edit-type"),
+        title: document.getElementById("edit-title"),
+        amount: document.getElementById("edit-amount"),
+        date: document.getElementById("edit-date"),
+        cancel: document.getElementById("cancel-edit"),
+      },
+      deleteModal: {
+        modal: document.getElementById("delete-modal"),
+        cancel: document.getElementById("cancel-delete"),
+        confirm: document.getElementById("confirm-delete"),
+      },
+      filters: {
+        toggleButton: document.getElementById("filter-toggle-button"),
+        controls: document.getElementById("filter-controls"),
         name: document.getElementById("filter-name"),
+        type: document.getElementById("filter-type"),
         amount: document.getElementById("filter-amount"),
         date: document.getElementById("filter-date"),
         sort: document.getElementById("sort-by"),
-        mName: document.getElementById("m-filter-name"),
-        mAmount: document.getElementById("m-filter-amount"),
-        mDate: document.getElementById("m-filter-date"),
-        mSort: document.getElementById("m-sort-by"),
-        mApply: document.getElementById("m-filter-apply"),
-      };
-
-    let transactions = [], allTransactions = [], currentPage = 1, deleteTargetId = null;
-    let currentAccountId = 'all'; // Track current selected account
-
-    // Listen for account changes from the balance component
-    function handleAccountChange() {
-      // Check if there's a global account selector
-      const accountSelect = document.getElementById('account-select');
-      if (accountSelect) {
-        currentAccountId = accountSelect.value;
-        console.log('Account changed to:', currentAccountId);
-        filterTransactionsByAccount();
-        renderTable();
-      }
-    }
-
-    // Set up account change listener
-    function setupAccountListener() {
-      const accountSelect = document.getElementById('account-select');
-      if (accountSelect) {
-        accountSelect.addEventListener('change', handleAccountChange);
-        currentAccountId = accountSelect.value || 'all';
-      }
-      
-      // Listen for custom events from the balance component
-      window.addEventListener('accountChanged', (e) => {
-        currentAccountId = e.detail.accountId || 'all';
-        console.log('Account changed via event to:', currentAccountId);
-        filterTransactionsByAccount();
-        renderTable();
-      });
-    }
-
-    // Filter transactions based on selected account
-    function filterTransactionsByAccount() {
-      if (currentAccountId === 'all') {
-        transactions = [...allTransactions];
-      } else {
-        transactions = allTransactions.filter(t => {
-          // Check the correct field name based on your schema
-          // Your schema uses 'bankAccountId' for both Purchase and Deposit models
-          const transactionAccountId = t.bankAccountId || t.account_id || t.accountId;
-          const matches = String(transactionAccountId) === String(currentAccountId);
-          
-          // Debug logging for first few mismatches
-          if (!matches && allTransactions.indexOf(t) < 5) {
-            console.log(`Transaction ${t.id} account ID: ${transactionAccountId} (type: ${typeof transactionAccountId}) vs selected: ${currentAccountId} (type: ${typeof currentAccountId})`);
-          }
-          
-          return matches;
-        });
-      }
-      
-      console.log(`Filtered transactions for account ${currentAccountId}:`, transactions.length, 'of', allTransactions.length);
-      if (transactions.length > 0) {
-        console.log('Sample filtered transaction:', transactions[0]);
-      }
-    }
-
-    // Toggle mobile filter dropdown
-    filterToggle.addEventListener("click", () => {
-      mobileFilters.classList.toggle("hidden");
-      const arrow = filterToggle.querySelector("svg");
-      arrow.style.transform = mobileFilters.classList.contains("hidden") ? "rotate(0deg)" : "rotate(180deg)";
-    });
-
-    // Close mobile filters when clicking outside
-    document.addEventListener("click", (e) => {
-      if (!mobileFilters.contains(e.target) && !filterToggle.contains(e.target)) {
-        mobileFilters.classList.add("hidden");
-        const arrow = filterToggle.querySelector("svg");
-        arrow.style.transform = "rotate(0deg)";
-      }
-    });
-
-    // Tooltip functionality
-    function showTooltip(element, text, event) {
-      tooltip.textContent = text;
-      tooltip.classList.remove("hidden");
-      
-      const rect = element.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
-      
-      let left = rect.left + (rect.width / 2) - (tooltipRect.width / 2);
-      let top = rect.top - tooltipRect.height - 5;
-      
-      // Adjust if tooltip goes off screen
-      if (left < 0) left = 5;
-      if (left + tooltipRect.width > window.innerWidth) left = window.innerWidth - tooltipRect.width - 5;
-      if (top < 0) top = rect.bottom + 5;
-      
-      tooltip.style.left = left + 'px';
-      tooltip.style.top = top + 'px';
-    }
-
-    function hideTooltip() {
-      tooltip.classList.add("hidden");
-    }
-
-    function truncateText(text, maxLength = 20) {
-      return text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
-    }
-
-    function clearAllFilters() {
-      inputs.name.value = "";
-      inputs.amount.value = "";
-      inputs.date.value = "";
-      inputs.sort.value = "date-desc";
-    }
-
-    clearBtn.addEventListener("click", () => { clearAllFilters(); refresh(); });
-    mClearBtn.addEventListener("click", () => {
-      clearAllFilters();
-      inputs.mName.value = "";
-      inputs.mAmount.value = "";
-      inputs.mDate.value = "";
-      inputs.mSort.value = "date-desc";
-      mobileFilters.classList.add("hidden");
-      refresh();
-    });
-
-    inputs.mApply.addEventListener("click", () => {
-      inputs.name.value = inputs.mName.value;
-      inputs.amount.value = inputs.mAmount.value;
-      inputs.date.value = inputs.mDate.value;
-      inputs.sort.value = inputs.mSort.value;
-      mobileFilters.classList.add("hidden");
-      const arrow = filterToggle.querySelector("svg");
-      arrow.style.transform = "rotate(0deg)";
-      refresh();
-    });
-
-    // Delete dialog handlers
-    document.getElementById("cancel-delete").onclick = () => deleteDialog.close();
-    document.getElementById("confirm-delete").onclick = async () => {
-      if (!deleteTargetId) return;
-      await fetch(`/api/user/delete/transaction/${deleteTargetId}`, { method: "DELETE" });
-      deleteTargetId = null;
-      deleteDialog.close();
-      refresh();
+        clear: document.getElementById("clear-filters"),
+        apply: document.getElementById("apply-filters")
+      },
     };
 
-    function formatDateString(d) {
-      const dt = new Date(d);
-      return dt.toLocaleDateString();
-    }
+    // --- STATE MANAGEMENT ---
+    let allTransactions = [];
+    let filteredTransactions = [];
+    let currentPage = 1;
+    let activeTransaction = null;
+    let currentAccountId = 'all'; // To track the selected account
 
-    function applyFilters(arr) {
-      return arr.filter(t => {
-        const matchName = t.title.toLowerCase().includes(inputs.name.value.trim().toLowerCase());
-        const matchAmount = !inputs.amount.value || Math.abs(t.amount) <= +inputs.amount.value;
-        const matchDate = !inputs.date.value
-          || new Date(t.date).toISOString().slice(0,10) === inputs.date.value;
-        return matchName && matchAmount && matchDate;
-      });
-    }
+    // --- UTILITY & HELPER FUNCTIONS ---
+    const formatDateString = (d) => new Date(d).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' });
+    const truncateText = (text, maxLength) => text.length > maxLength ? text.substring(0, maxLength) + "..." : text;
+    const cleanupDropdowns = () => document.querySelectorAll(".dropdown-menu").forEach(d => d.remove());
 
-    function applySort(arr) {
-      return arr.sort((a, b) => {
-        switch (inputs.sort.value) {
-          case "date-asc": return new Date(a.date) - new Date(b.date);
-          case "amount-desc": return b.amount - a.amount;
-          case "amount-asc": return a.amount - b.amount;
-          default: return new Date(b.date) - new Date(a.date);
-        }
-      });
-    }
+    // --- DIALOG/MODAL LOGIC (CUSTOM) ---
+    function openModal(type, transaction) {
+      activeTransaction = transaction;
 
-    function renderPagination(totalPages) {
-      paginationWrapper.innerHTML = "";
-      const p = document.createElement("pagination-control");
-      p.setAttribute("page-count", totalPages);
-      p.setAttribute("current-page", currentPage);
-      p.addEventListener("page-change", e => {
-        currentPage = +e.detail;
-        renderTable();
-      });
-      paginationWrapper.append(p);
-    }
+      if (type === 'edit') {
+        const { id, type: txType, title, amount, date } = transaction;
+        elements.editModal.id.value = id;
+        elements.editModal.type.value = txType;
+        elements.editModal.title.value = title;
+        // Set initial formatted value
+        elements.editModal.amount.value = Math.abs(amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        const dateObj = new Date(date);
+        const year = dateObj.getUTCFullYear();
+        const month = (dateObj.getUTCMonth() + 1).toString().padStart(2, '0');
+        const day = dateObj.getUTCDate().toString().padStart(2, '0');
+        elements.editModal.date.value = `${year}-${month}-${day}`;
 
-    function renderTable() {
-      const list = applySort(applyFilters([...transactions]));
-      const paged = list.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE);
-
-      // No data
-      if (!list.length) {
-        const message = currentAccountId === 'all' 
-          ? 'No transactions found.' 
-          : `No transactions found for selected account.`;
-        tableContainer.innerHTML = `<div class="p-4 text-gray-500">${message}</div>`;
-        paginationWrapper.innerHTML = "";
-        return;
+        elements.editModal.modal.classList.remove('hidden');
+        elements.editModal.modal.classList.add('flex');
+      } else if (type === 'delete') {
+        elements.deleteModal.modal.classList.remove('hidden');
+        elements.deleteModal.modal.classList.add('flex');
       }
-
-      renderPagination(Math.ceil(list.length / ITEMS_PER_PAGE));
-
-      const table = document.createElement("table");
-      table.className = "w-full table-fixed text-sm border-collapse";
-      table.innerHTML = `
-        <thead class="bg-gray-100 text-gray-700">
-          <tr>
-            <th class="w-2/5 px-4 py-2 text-left">Title</th>
-            <th class="w-1/5 px-4 py-2 text-left">Amount</th>
-            <th class="w-1/5 px-4 py-2 text-left">Date</th>
-            <th class="hidden md:table-cell w-1/6 px-4 py-2 text-left">Type</th>
-            <th class="w-12 px-4 py-2"></th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white"></tbody>
-      `;
-      const tb = table.querySelector("tbody");
-
-      list.slice((currentPage-1)*ITEMS_PER_PAGE, currentPage*ITEMS_PER_PAGE).forEach(t => {
-        const isDep = t.type === "deposit";
-        const clr = isDep ? "text-green-600" : "text-red-600";
-        
-        // Mobile-specific truncation
-        const isMobile = window.innerWidth < 768; // md breakpoint
-        const maxLength = isMobile ? 15 : 35;
-        const truncatedTitle = truncateText(t.title, maxLength);
-        const showTitleTooltip = t.title.length > maxLength;
-        
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="px-4 py-2">
-            <span class="truncate-text ${showTitleTooltip ? 'cursor-pointer hover:text-blue-600' : ''}" 
-                  ${showTitleTooltip ? `data-full-text="${t.title}"` : ''}>${truncatedTitle}</span>
-          </td>
-          <td class="px-4 py-2 font-semibold ${clr}">${Math.abs(t.amount).toFixed(2)}</td>
-          <td class="px-4 py-2 text-gray-500">${formatDateString(t.date)}</td>
-          <td class="hidden md:table-cell px-4 py-2 text-gray-500 text-left">${isDep ? "Deposit" : "Purchase"}</td>
-          <td class="px-4 py-2 text-right relative">
-            <button class="menu-btn text-gray-500 hover:text-gray-700" data-id="${t.id}">
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-              </svg>
-            </button>
-            <div class="dropdown hidden absolute right-0 mt-2 w-28 bg-white border rounded shadow-lg z-50">
-              <div class="px-2 py-1 hover:bg-gray-100 cursor-pointer edit-item" data-id="${t.id}">Edit</div>
-              <div class="px-2 py-1 hover:bg-red-100 text-red-600 cursor-pointer delete-item" data-id="${t.id}">Delete</div>
-            </div>
-          </td>
-        `;
-        tb.append(tr);
-      });
-
-      tableContainer.innerHTML = "";
-      tableContainer.append(table);
-
-      // Menu button events
-      document.querySelectorAll(".menu-btn").forEach(btn =>
-        btn.onclick = e => {
-          e.stopPropagation();
-          document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
-          btn.nextElementSibling.classList.toggle("hidden");
-        });
-
-      document.querySelectorAll(".delete-item").forEach(btn =>
-        btn.onclick = e => {
-          e.stopPropagation();
-          deleteTargetId = btn.dataset.id;
-          deleteDialog.showModal();
-        });
-
-      // Tooltip events for truncated text
-      document.querySelectorAll(".truncate-text[data-full-text]").forEach(span => {
-        span.addEventListener("click", e => {
-          e.stopPropagation();
-          showTooltip(span, span.dataset.fullText, e);
-        });
-      });
-
-      document.body.addEventListener("click", () => {
-        document.querySelectorAll(".dropdown").forEach(d => d.classList.add("hidden"));
-        hideTooltip();
-      });
     }
 
+    function closeModal() {
+        elements.editModal.modal.classList.add('hidden');
+        elements.editModal.modal.classList.remove('flex');
+        elements.deleteModal.modal.classList.add('hidden');
+        elements.deleteModal.modal.classList.remove('flex');
+        activeTransaction = null;
+    }
+    
+    // --- API & DATA HANDLING ---
     async function refresh() {
-      currentPage = 1;
       await fetchTransactions();
     }
-
+    
     async function fetchTransactions() {
       try {
+        elements.tableContainer.innerHTML = '<div class="text-gray-500 p-4">Loading transactions...</div>';
         const now = new Date(), start = new Date(now);
-        start.setMonth(start.getMonth() - 1);
-
+        start.setMonth(start.getMonth() - 2);
         const body = JSON.stringify({ startDate: start.toISOString(), endDate: now.toISOString() });
         const headers = { "Content-Type": "application/json" };
         const [p, d] = await Promise.all([
@@ -391,47 +208,325 @@ const ITEMS_PER_PAGE = 20;
           fetch("/api/user/fetch/deposits", { method:"POST", headers, body }).then(r => r.json())
         ]);
         
-        // Store all transactions
         allTransactions = [
-          ...p.map(x => ({ ...x, type: "purchase" })),
-          ...d.map(x => ({ ...x, type: "deposit" }))
+          ...p.map(x => ({ ...x, type: "purchase", id: x.id })),
+          ...d.map(x => ({ ...x, type: "deposit", id: x.id }))
         ];
         
-        console.log('Fetched transactions:', allTransactions.length);
-        if (allTransactions.length > 0) {
-          console.log('Sample transaction with all fields:', allTransactions[0]);
-          console.log('Transaction field names:', Object.keys(allTransactions[0]));
-          console.log('Bank account IDs found:', [...new Set(allTransactions.map(t => t.bankAccountId || t.account_id || t.accountId))]);
-        }
-        
-        // Filter by current account
-        filterTransactionsByAccount();
-        renderTable();
+        applyFiltersAndSort();
+        render();
       } catch (err) {
-        console.error(err);
-        tableContainer.innerHTML = '<div class="p-4 text-red-600">Failed to load.</div>';
+        console.error("Failed to fetch transactions:", err);
+        elements.tableContainer.innerHTML = '<div class="p-4 text-red-600">Failed to load transactions.</div>';
       }
     }
 
-    inputs.name.addEventListener("input", () => {
-      currentPage = 1;
+    // --- RENDERING LOGIC ---
+    function applyFiltersAndSort() {
+      const { name, type, amount, date, sort } = elements.filters;
+      
+      const accountFiltered = currentAccountId === 'all'
+        ? allTransactions
+        : allTransactions.filter(t => String(t.bankAccountId) === String(currentAccountId));
+        
+      const otherFiltered = accountFiltered.filter(t => {
+        const matchName = !name.value || t.title.toLowerCase().includes(name.value.trim().toLowerCase());
+        const matchType = type.value === 'all' || t.type === type.value;
+        const matchAmount = !amount.value || Math.abs(t.amount) <= +amount.value;
+        const matchDate = !date.value || new Date(t.date).toISOString().slice(0,10) === date.value;
+        return matchName && matchType && matchAmount && matchDate;
+      });
+
+      // **FIX:** Add stable sort by using ID as a secondary sort criterion.
+      otherFiltered.sort((a, b) => {
+        switch (sort.value) {
+          case "date-asc": {
+            const dateDiff = new Date(a.date) - new Date(b.date);
+            if (dateDiff !== 0) return dateDiff;
+            return a.id - b.id; // Secondary sort
+          }
+          case "amount-desc":
+            return Math.abs(b.amount) - Math.abs(a.amount);
+          case "amount-asc":
+            return Math.abs(a.amount) - Math.abs(b.amount);
+          default: { // date-desc
+            const dateDiff = new Date(b.date) - new Date(a.date);
+            if (dateDiff !== 0) return dateDiff;
+            return b.id - a.id; // Secondary sort
+          }
+        }
+      });
+
+      filteredTransactions = otherFiltered;
+
+      if (Math.ceil(filteredTransactions.length / ITEMS_PER_PAGE) < currentPage) {
+        currentPage = 1;
+      }
+    }
+    
+    function render() {
       renderTable();
-    });
-    inputs.amount.addEventListener("input", () => {
-      currentPage = 1;
-      renderTable();
-    });
-    inputs.date.addEventListener("change", () => {
-      currentPage = 1;
-      renderTable();
-    });
-    inputs.sort.addEventListener("change", () => {
-      currentPage = 1;
-      renderTable();
+      renderPagination();
+      attachEventListeners();
+    }
+
+    function renderTable() {
+      if (!filteredTransactions.length) {
+        elements.tableContainer.innerHTML = `<div class="p-4 text-gray-500">No transactions found for the selected criteria.</div>`;
+        return;
+      }
+      const pagedList = filteredTransactions.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+      const isMobile = window.innerWidth < 768;
+      const tableContent = pagedList.map(t => isMobile ? createMobileCard(t) : createDesktopRow(t)).join('');
+      
+      if (isMobile) {
+        elements.tableContainer.className = "bg-transparent shadow-none";
+        elements.tableContainer.innerHTML = `<div class="p-2 sm:p-0">${tableContent}</div>`;
+      } else {
+        elements.tableContainer.className = "bg-white rounded-xl shadow text-sm mb-6 relative";
+        elements.tableContainer.innerHTML = `
+          <table class="w-full table-fixed text-sm border-collapse">
+            <thead class="bg-gray-100/70 text-gray-600">
+              <tr><th class="w-2/5 px-4 py-3 text-left font-medium">Title</th><th class="w-1/4 px-4 py-3 text-left font-medium">Amount</th><th class="w-1/4 px-4 py-3 text-left font-medium">Date</th><th class="w-1/6 px-4 py-3 text-left font-medium">Type</th><th class="w-12 px-4 py-3"></th></tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">${tableContent}</tbody>
+          </table>`;
+      }
+    }
+
+    function createMobileCard(t) {
+        return `
+          <div class="p-4 bg-white mb-2 rounded-lg border border-gray-200/80">
+            <div class="flex justify-between items-center">
+              <div class="flex-1 min-w-0">
+                <div class="font-medium text-gray-800 truncate">${truncateText(t.title, 25)}</div>
+                <div class="text-sm text-gray-500 mt-1">${formatDateString(t.date)}</div>
+              </div>
+              <div class="flex items-center ml-4">
+                <div class="font-semibold text-base ${t.type === 'deposit' ? 'text-green-600' : 'text-red-600'} mr-3">
+                  ${t.type === 'deposit' ? '+' : '-'}$${Math.abs(t.amount).toFixed(2)}
+                </div>
+                <div class="relative"><button class="menu-btn p-2 rounded-full hover:bg-gray-100" data-id="${t.id}"><svg class="w-5 h-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"/></svg></button></div>
+              </div>
+            </div>
+          </div>`;
+    }
+
+    function createDesktopRow(t) {
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 truncate">${truncateText(t.title, 35)}</td>
+            <td class="px-4 py-3 font-semibold ${t.type === 'deposit' ? 'text-green-600' : 'text-red-600'}">$${Math.abs(t.amount).toFixed(2)}</td>
+            <td class="px-4 py-3 text-gray-500">${formatDateString(t.date)}</td>
+            <td class="px-4 py-3 text-gray-500">${t.type === 'deposit' ? "Deposit" : "Purchase"}</td>
+            <td class="px-4 py-3 text-right relative"><button class="menu-btn p-1 rounded-full hover:bg-gray-200" data-id="${t.id}"><svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM18 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg></button></td>
+          </tr>`;
+    }
+    
+    function generatePaginationItems(currentPage, totalPages) {
+        const delta = 1;
+        const range = [];
+        for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
+            range.push(i);
+        }
+        if (currentPage - delta > 2) range.unshift('...');
+        if (currentPage + delta < totalPages - 1) range.push('...');
+        range.unshift(1);
+        if (totalPages > 1) range.push(totalPages);
+        return [...new Set(range)];
+    }
+
+    function renderPagination() {
+        elements.paginationWrapper.innerHTML = "";
+        const totalItems = filteredTransactions.length;
+        if (totalItems <= ITEMS_PER_PAGE) return;
+
+        const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+        const pageItems = generatePaginationItems(currentPage, totalPages).map(page => {
+            if (page === '...') {
+                return `<li><span class="px-3 py-2">...</span></li>`;
+            }
+            const activeClasses = 'bg-blue-600 text-white border-blue-600';
+            const defaultClasses = 'bg-white hover:bg-gray-100';
+            return `<li><button data-page="${page}" class="px-3 py-2 leading-tight border rounded-md ${page === currentPage ? activeClasses : defaultClasses}">${page}</button></li>`;
+        }).join('');
+
+        const prevDisabled = currentPage === 1 ? 'opacity-50 cursor-not-allowed' : '';
+        const nextDisabled = currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : '';
+
+        elements.paginationWrapper.innerHTML = `
+          <ul class="inline-flex items-center -space-x-px text-sm gap-1">
+            <li><button data-page="${currentPage - 1}" class="px-3 py-2 leading-tight bg-white border rounded-md hover:bg-gray-100 ${prevDisabled}">Previous</button></li>
+            ${pageItems}
+            <li><button data-page="${currentPage + 1}" class="px-3 py-2 leading-tight bg-white border rounded-md hover:bg-gray-100 ${nextDisabled}">Next</button></li>
+          </ul>`;
+    }
+
+    // --- EVENT LISTENERS ---
+    function attachEventListeners() {
+      elements.tableContainer.onclick = (e) => {
+          const menuBtn = e.target.closest('.menu-btn');
+          if (menuBtn) {
+              e.stopPropagation();
+              cleanupDropdowns();
+              const transaction = allTransactions.find(t => t.id == menuBtn.dataset.id); 
+              if (transaction) createDropdownMenu(menuBtn, transaction);
+          }
+      };
+    }
+    
+    function createDropdownMenu(btn, transaction) {
+      const dropdown = document.createElement("div");
+      dropdown.onclick = (e) => e.stopPropagation();
+      dropdown.className = "dropdown-menu absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-50";
+
+      const editItem = document.createElement("div");
+      editItem.className = "px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm";
+      editItem.textContent = "Edit";
+      editItem.onclick = () => {
+        cleanupDropdowns();
+        openModal('edit', transaction);
+      };
+
+      const deleteItem = document.createElement("div");
+      deleteItem.className = "px-3 py-2 hover:bg-red-100 text-red-600 cursor-pointer text-sm";
+      deleteItem.textContent = "Delete";
+      deleteItem.onclick = () => {
+        cleanupDropdowns();
+        openModal('delete', transaction);
+      };
+
+      dropdown.append(editItem, deleteItem);
+      btn.parentElement.appendChild(dropdown);
+    }
+    
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest('.menu-btn, .dropdown-menu')) {
+        cleanupDropdowns();
+      }
+      
+      const pageButton = e.target.closest('[data-page]');
+      if (pageButton && !pageButton.disabled && !pageButton.classList.contains('opacity-50')) {
+        currentPage = parseInt(pageButton.dataset.page, 10);
+        elements.section.scrollIntoView({ behavior: 'smooth' });
+        render();
+      }
     });
 
-    // Initialize
-    setupAccountListener();
+    elements.filters.toggleButton.addEventListener('click', () => {
+        elements.filters.controls.classList.toggle('hidden');
+    });
+
+    elements.filters.apply.addEventListener('click', () => {
+        applyFiltersAndSort();
+        render();
+        if(window.innerWidth < 768) {
+            elements.filters.controls.classList.add('hidden');
+        }
+    });
+    
+    elements.filters.clear.addEventListener('click', () => {
+        elements.filters.name.value = '';
+        elements.filters.type.value = 'all';
+        elements.filters.amount.value = '';
+        elements.filters.date.value = '';
+        elements.filters.sort.value = 'date-desc';
+        applyFiltersAndSort();
+        render();
+        if(window.innerWidth < 768) {
+            elements.filters.controls.classList.add('hidden');
+        }
+    });
+
+    window.addEventListener('resize', render, { passive: true });
+
+    // Listen for account changes from the other component
+    window.addEventListener('accountChanged', (e) => {
+        currentAccountId = e.detail.accountId;
+        applyFiltersAndSort();
+        render();
+    });
+    
+    // --- MODAL EVENT LISTENERS ---
+    elements.editModal.amount.addEventListener('input', (e) => {
+        const input = e.target;
+        const raw = input.value;
+        const cursorStart = input.selectionStart;
+        let value = raw.replace(/,/g, '');
+        
+        const validChars = value.match(/^(\d*)(\.?)(\d*)/) || [];
+        let intPart = validChars[1] || '';
+        let dot = validChars[2] || '';
+        let decPart = validChars[3] || '';
+
+        if (decPart.length > 2) {
+            const rounded = Math.round(parseFloat(intPart + '.' + decPart) * 100) / 100;
+            const [newInt, newDec = ''] = rounded.toFixed(2).split('.');
+            intPart = newInt;
+            decPart = newDec;
+            dot = '.';
+        }
+
+        const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        let formattedValue = intWithCommas;
+        if (dot) {
+            formattedValue += '.' + decPart;
+        }
+
+        const oldLeft = raw.slice(0, cursorStart);
+        const newLeft = formattedValue.slice(0, cursorStart);
+        const commasBefore = (oldLeft.match(/,/g) || []).length;
+        const commasAfter = (newLeft.match(/,/g) || []).length;
+        const diff = commasAfter - commasBefore;
+
+        input.value = formattedValue;
+        input.setSelectionRange(cursorStart + diff, cursorStart + diff);
+    });
+
+    elements.editModal.form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const dateValue = elements.editModal.date.value;
+        const localDate = new Date(dateValue + 'T00:00:00');
+        const amountValue = parseFloat(elements.editModal.amount.value.replace(/,/g, ''));
+
+        const endpoint = `/api/user/edit/${elements.editModal.type.value}`;
+        const body = JSON.stringify({
+            id: parseInt(elements.editModal.id.value, 10),
+            title: elements.editModal.title.value,
+            amount: amountValue,
+            date: localDate.toISOString(),
+        });
+        
+        try {
+            await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+            closeModal();
+            await refresh();
+        } catch (err) {
+            console.error("Error updating transaction:", err);
+        }
+    });
+
+    elements.deleteModal.confirm.addEventListener('click', async () => {
+        if (!activeTransaction) return;
+        const endpoint = `/api/user/delete/${activeTransaction.type}`;
+        const body = JSON.stringify({ id: activeTransaction.id });
+        
+        try {
+            await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body });
+            closeModal();
+            await refresh();
+        } catch (err) {
+            console.error("Error deleting transaction:", err);
+        }
+    });
+    
+    elements.editModal.cancel.addEventListener('click', closeModal);
+    elements.deleteModal.cancel.addEventListener('click', closeModal);
+
+    // --- INITIALIZATION ---
     fetchTransactions();
+
   </script>
 </section>
