@@ -1,12 +1,12 @@
 ---
 export const prerender = false;
 
-import { hasOnboarded } from '../../lib/auth/hasOnboarded';
-import Layout from '../../layouts/DashboardLayout.astro';
-import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
-import RecentTransactions from '../../components/DashboardComps/RecentTransactions.astro';
-import PieChart from '../../components/DashboardComps/PieChart.tsx';
-import Header from '../../components/DashboardComps/Header.astro';
+import { hasOnboarded } from '@/lib/auth/hasOnboarded.ts';
+import Layout from '@/layouts/DashboardLayout.astro';
+import DashboardNav from '@/components/DashboardComps/DashboardNav.astro';
+import RecentTransactions from '@/components/DashboardComps/RecentTransactions.astro';
+import PieChart from '@/components/DashboardComps/PieChart.tsx';
+import Header from '@/components/DashboardComps/Header.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -24,7 +24,7 @@ if (!onboarded) {
 <Layout>
   <Header />
   <div class="pt-4 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <RecentTransactions title="Purchases" refreshInterval={30000} />
+    <RecentTransactions title="Purchases"/>
     <PieChart client:load />
   </div>
 

@@ -1,24 +1,16 @@
 ---
-import "../../global.css";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/starwind/select";
+import "@/global.css";
 ---
 
 <section class="bg-gray-50 p-4 sm:p-6 md:p-8 pb-0 md:pb-0 sm:pb-0">
   <div class="max-w-screen-xl mx-auto">
     <div class="flex flex-row items-center justify-between gap-2 mb-1">
-      <!-- Balance Display -->
+      
       <div class="flex flex-col justify-center leading-tight">
         <p class="text-gray-500 text-xs mb-0.5">Current Balance</p>
         <p id="balance-display" class="font-bold text-2xl text-gray-800">$0.00</p>
       </div>
       
-      <!-- Account Selector -->
       <div class="flex items-center">
         <select 
           id="account-select"
@@ -31,100 +23,4 @@ import {
   </div>
 </section>
 
-<script type="module" is:client>
-  const balanceDisplay = document.getElementById('balance-display');
-  const accountSelect = document.getElementById('account-select');
-  
-  let accounts = [];
-  
-  function formatCurrency(amount) {
-    return amount.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-    });
-  }
-  
-  function updateBalance(accountId) {
-    let total = 0;
-    
-    if (accountId === 'all') {
-      total = accounts.reduce((sum, acc) => {
-        const balance = parseFloat(acc.balance || 0);
-        return sum + balance;
-      }, 0);
-      console.log('Total for all accounts:', total);
-    } else {
-      const acc = accounts.find(a => String(a.id) === String(accountId));
-      console.log('Found account:', acc);
-      
-      if (acc) {
-        total = parseFloat(acc.balance || 0);
-      } else {
-        console.error('Account not found for ID:', accountId);
-      }
-    }
-    
-    balanceDisplay.textContent = formatCurrency(total);
-    window.currentBalance = total;
-    
-    // Dispatch custom event to notify other components
-    window.dispatchEvent(new CustomEvent('accountChanged', {
-      detail: { accountId: accountId }
-    }));
-    
-    // Add visual feedback for balance changes
-    balanceDisplay.style.transform = 'scale(1.05)';
-    setTimeout(() => {
-      balanceDisplay.style.transform = 'scale(1)';
-    }, 200);
-  }
-  
-  function populateAccountOptions() {
-    // Clear existing options except "All Accounts"
-    accountSelect.innerHTML = '<option value="all">All Accounts</option>';
-    
-    // Add account options
-    accounts.forEach(account => {
-      const option = document.createElement('option');
-      option.value = String(account.id); // Ensure ID is stored as string
-      option.textContent = `${account.name}`;
-      accountSelect.appendChild(option);
-    });
-    
-    console.log('Populated options for accounts:', accounts.map(a => ({
-      id: a.id, 
-      name: a.name, 
-      balance: a.balance,
-      idType: typeof a.id
-    })));
-  }
-  
-  // Handle account selection change
-  accountSelect.addEventListener('change', (e) => {
-    updateBalance(e.target.value);
-  });
-  
-  async function fetchAccounts() {
-    try {
-      const res = await fetch('/api/user/fetch/accounts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!res.ok) throw new Error('Failed to fetch accounts');
-      accounts = await res.json();
-      
-      populateAccountOptions();
-      updateBalance('all');
-    } catch (err) {
-      console.error('Error loading accounts:', err);
-      balanceDisplay.textContent = 'Error loading balance';
-      balanceDisplay.className = 'font-bold text-2xl text-red-600';
-    }
-  }
-  
-  // Add smooth transition for balance display
-  balanceDisplay.style.transition = 'transform 0.2s ease-in-out';
-  
-  fetchAccounts();
-</script>
+<script src="@/scripts/Dashboard/Header.js"></script>
