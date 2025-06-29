@@ -1,8 +1,8 @@
 ---
 export const prerender = false;
-import { hasOnboarded } from '../../lib/auth/hasOnboarded';
-import Layout from '../../layouts/DashboardLayout.astro';
-import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
+import { hasOnboarded } from '@/lib/auth/hasOnboarded';
+import Layout from '@/layouts/Dashboard.astro';
+import Navigation from '@/components/Dashboard/Navigation.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -21,5 +21,5 @@ if (!onboarded) {
   <form action="/api/logout" method="POST">
     <button type="submit">Logout</button>
   </form>
-  <DashboardNav />
+  <Navigation />
 </Layout>

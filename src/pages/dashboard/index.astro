@@ -2,11 +2,11 @@
 export const prerender = false;
 
 import { hasOnboarded } from '@/lib/auth/hasOnboarded.ts';
-import Layout from '@/layouts/DashboardLayout.astro';
-import DashboardNav from '@/components/DashboardComps/DashboardNav.astro';
-import RecentTransactions from '@/components/DashboardComps/RecentTransactions.astro';
-import PieChart from '@/components/DashboardComps/PieChart.tsx';
-import Header from '@/components/DashboardComps/Header.astro';
+import Layout from '@/layouts/Dashboard.astro';
+import Navigation from '@/components/Dashboard/Navigation.astro';
+import RecentTransactions from '@/components/Dashboard/RecentTransactions.astro';
+import PieChart from '@/components/Dashboard/PieChart';
+import Header from '@/components/Dashboard/Accounts.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -28,5 +28,5 @@ if (!onboarded) {
     <PieChart client:load />
   </div>
 
-  <DashboardNav />
+  <Navigation />
 </Layout>

@@ -1,7 +1,7 @@
 ---
-import Layout from '../../layouts/BaseLayout.astro';
-import OnboardTile from '../../components/OnboardingTile.astro';
-import { hasOnboarded } from '../../lib/auth/hasOnboarded';
+import Layout from '@/layouts/Base.astro';
+import OnboardForm from '@/components/Registration/OnboardingForm.astro';
+import { hasOnboarded } from '@/lib/auth/hasOnboarded';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -21,6 +21,6 @@ export const prerender = false;
 <Layout>
   <div class="pt-20 bg-gradient-to-br from-blue-100 to-blue-200">
     <main class=""/>
-    <OnboardTile />
+    <OnboardForm />
   </div>
 </Layout>

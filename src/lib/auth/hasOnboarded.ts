@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { verifyToken } from '../../pages/api/verify-token.ts';
+import { verifyToken } from '@/pages/api/verify-token.ts';
 
 const prisma = new PrismaClient();
 

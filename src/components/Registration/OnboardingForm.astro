@@ -1,0 +1,73 @@
+---
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/starwind/card";
+import { Input } from "@/components/starwind/input";
+import { Label } from "@/components/starwind/label";
+import { Button } from "@/components/starwind/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/starwind/select";
+---
+
+<div class="flex items-center justify-center min-h-screen pt-5 p-4">
+  <Card class="w-full max-w-2xl shadow-xl border border-gray-200">
+    <CardHeader>
+      <CardTitle class="text-center text-3xl font-semibold text-blue-900">Welcome to FinanceBros</CardTitle>
+      <p class="text-center text-sm text-gray-600">Set up your financial profile to get started</p>
+    </CardHeader>
+    <form id="onboardingForm" class="w-full space-y-6" novalidate>
+      <CardContent class="space-y-6">
+
+        <div class="flex flex-col gap-1">
+          <Label for="firstName">First Name <span class="text-red-500">*</span></Label>
+          <Input id="firstName" name="firstName" placeholder="e.g. John" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="lastName">Last Name <span class="text-red-500">*</span></Label>
+          <Input id="lastName" name="lastName" placeholder="e.g. Doe" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="age">Your Age <span class="text-red-500">*</span></Label>
+          <Input id="age" name="age" type="number" inputmode="numeric" placeholder="e.g. 25" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="employer">Employer</Label>
+          <Input id="employer" name="employer" placeholder="e.g. Amazon" />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="creditScore">Credit Score <span class="text-red-500">*</span></Label>
+          <Input id="creditScore" name="creditScore" type="number" placeholder="e.g. 720" required />
+        </div>
+
+        <div class="flex flex-col gap-1">
+          <Label for="income">Estimated Monthly Income <span class="text-red-500">*</span></Label>
+          <Select id="income" name="income">
+            <SelectTrigger>
+              <SelectValue placeholder="Select income range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="under-1000">Under $1,000</SelectItem>
+              <SelectItem value="1000-3000">$1,000 - $3,000</SelectItem>
+              <SelectItem value="3000-5000">$3,000 - $5,000</SelectItem>
+              <SelectItem value="over-5000">Over $5,000</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div class="space-y-4">
+          <Label class="block">Bank Accounts <span class="text-red-500">*</span></Label>
+          <div id="accountsContainer" class="space-y-4"></div>
+          <Button type="button" variant="outline" id="addAccountBtn" class="w-full mt-2">+ Add Another Account</Button>
+        </div>
+
+        <p id="errorMessage" class="text-red-500 text-sm"></p>
+      </CardContent>
+      <CardFooter>
+        <Button id="submitBtn" type="submit" class="w-full">Continue</Button>
+      </CardFooter>
+    </form>
+  </Card>
+</div>
+
+<script src="@/scripts/User/OnboardingForm.js" />

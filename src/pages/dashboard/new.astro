@@ -1,9 +1,9 @@
 ---
 export const prerender = false;
-import { hasOnboarded } from '../../lib/auth/hasOnboarded';
-import Layout from '../../layouts/DashboardLayout.astro';
-import DashboardNav from '../../components/DashboardComps/DashboardNav.astro';
-import AddEntryTabs from '../../components/DashboardComps/New/NewEntry.astro';
+import { hasOnboarded } from '@/lib/auth/hasOnboarded';
+import Layout from '@/layouts/Dashboard.astro';
+import Navigation from '@/components/Dashboard/Navigation.astro';
+import AddEntryTabs from '@/components/Dashboard/New/NewEntry.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -31,6 +31,6 @@ if (!onboarded) {
       </div>
     </div>
     
-    <DashboardNav />
+    <Navigation />
   </div>
 </Layout>

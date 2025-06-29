@@ -1,0 +1,36 @@
+---
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/starwind/card";
+import { Input } from "@/components/starwind/input";
+import { Label } from "@/components/starwind/label";
+import { Button } from "@/components/starwind/button";
+
+const { type } = Astro.props;
+const apiPath = type === "register" ? "/api/register" : "/api/login";
+const title = type === "register" ? "Register" : "Login";
+---
+
+<div class="flex items-center justify-center min-h-screen bg-blue-50 p-4">
+  <Card class="w-full max-w-md">
+    <CardHeader>
+      <CardTitle class="text-center">{title}</CardTitle>
+    </CardHeader>
+    <form id="authForm" data-api={apiPath} novalidate>
+      <CardContent class="flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <Label for="email">Email</Label>
+          <Input id="email" type="email" placeholder="Enter your email" />
+        </div>
+        <div class="flex flex-col gap-2">
+          <Label for="password">Password</Label>
+          <Input id="password" type="password" placeholder="Enter your password" />
+        </div>
+        <p id="errorMessage" class="text-red-500 text-sm"></p>
+      </CardContent>
+      <CardFooter>
+        <Button id="submitBtn" type="submit" class="w-full">{title}</Button>
+      </CardFooter>
+    </form>
+  </Card>
+</div>
+
+<script src="@/scripts/User/RegistrationForm.js" />

@@ -1,8 +1,8 @@
 ---
-import Layout from '../../layouts/BaseLayout.astro';
-import RegisterTile from '../../components/RegisterTile.astro';
+import Layout from '../../layouts/Base.astro';
+import RegistrationForm from '@/components/Registration/RegistrationForm.astro';
 export const prerender = true;
 ---
 <Layout>
-    <RegisterTile type="login"/>
+    <RegistrationForm type="login"/>
 </Layout>
