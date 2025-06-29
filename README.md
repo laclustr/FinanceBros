@@ -38,7 +38,7 @@ npm install
 - Locate a Serverless Postgres Database (Neon Recommended)
 - Create a .env file with the Following:
 ```
-DATABASE_URL=  // Should be in the format: "postgresql://[user[:password]@][netloc][:port][/dbname][?param1=value1&...]"
+DATABASE_URL=  // Should be in the format: "postgresql://[user[:password]@][netloc][:port][/dbname]?sslmode=require"
 JWT_SECRET=  // Random string of alphanumeric characters; the longer the better
 ```
 - Finally, run this Command to Access the Website
