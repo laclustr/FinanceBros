@@ -1,0 +1,33 @@
+---
+---
+<div id="edit-modal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div class="p-4 border-b">
+        <h3 class="text-lg font-medium">Edit Transaction</h3>
+      </div>
+      <form id="edit-form">
+        <div class="p-6">
+            <input type="hidden" id="edit-id" />
+            <input type="hidden" id="edit-type" />
+            <div class="grid gap-5">
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-title" class="text-right text-sm font-medium">Title</label>
+                <input id="edit-title" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-amount" class="text-right text-sm font-medium">Amount</label>
+                <input id="edit-amount" type="text" placeholder="0.00" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+              <div class="grid grid-cols-4 items-center gap-4">
+                <label for="edit-date" class="text-right text-sm font-medium">Date</label>
+                <input id="edit-date" type="date" class="col-span-3 h-10 border border-gray-300 rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" required />
+              </div>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-gray-50 rounded-b-lg flex justify-end gap-2">
+          <button type="button" id="cancel-edit" class="px-4 py-2 text-sm border rounded-md hover:bg-gray-100">Cancel</button>
+          <button type="submit" class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
