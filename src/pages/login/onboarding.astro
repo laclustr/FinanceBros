@@ -1,7 +1,7 @@
 ---
 import Layout from '@/layouts/Base.astro';
 import OnboardForm from '@/components/Registration/OnboardingForm.astro';
-import { hasOnboarded } from '@/lib/auth/hasOnboarded';
+import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;

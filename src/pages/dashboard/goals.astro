@@ -1,9 +1,10 @@
 ---
 export const prerender = false;
-import { hasOnboarded } from '@/lib/auth/hasOnboarded';
+import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 import Layout from '@/layouts/Dashboard.astro';
 import Navigation from '@/components/Dashboard/Navigation.astro';
 import Accounts from '@/components/Dashboard/Accounts.astro';
+import Goals from '@/components/Dashboard/Goals/Goals.astro';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -21,5 +22,6 @@ if (!onboarded) {
 
 <Layout title="Goals">
   <Accounts />
+  <Goals />
   <Navigation />
 </Layout>
