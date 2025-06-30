@@ -1,7 +1,19 @@
- ---
- ---
+---
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { IconComponent } from "@/components/icons";
+
+const goalsId = "goal-cards";
+---
 
 <section id="goal-section" class="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 pt-0 sm:pt-0 md:pt-0 transition-all duration-300">
-    
+    <div class="max-w-screen-xl mx-auto">
+        <div class="text-center">
+            <h1 class="text-sm sm:text-md p-69 sm:p-34 font-bold text-gray-500 ">Loading Goals...</h1>
+        </div>
+        <div id={goalsId} class="hidden">
+        </div>
+    </div>
+
     <script src="@/scripts/Dashboard/Goals/main.js" />
 </section>

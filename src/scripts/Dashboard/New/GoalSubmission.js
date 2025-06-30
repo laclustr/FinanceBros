@@ -63,7 +63,7 @@ window.addEventListener("DOMContentLoaded", () => {
           form.reset();
         }
       } catch (error) {
-        errorText.textContent = 'Network error - please try again.';
+        errorText.textContent = `Network error - please try again.`;
         errorDiv.classList.remove('hidden');
       } finally {
         submitButton.disabled = false;
