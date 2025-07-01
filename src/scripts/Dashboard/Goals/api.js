@@ -1,6 +1,6 @@
 import { createGoalCard } from "./cards.js";
 
-export async function fetchTransactions() {
+export async function fetchGoals() {
   try {
     const body = JSON.stringify({});
     const headers = { "Content-Type": "application/json" };
@@ -10,7 +10,7 @@ export async function fetchTransactions() {
     createGoalCard(goals);
 
   } catch (err) {
-    console.error("Failed to fetch transactions:", err);
+    console.error("Failed to fetch goals:", err);
     throw err;
   }
 }
