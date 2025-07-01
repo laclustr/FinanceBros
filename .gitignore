@@ -4,6 +4,7 @@ sw.js
 
 # generated types
 .astro/
+package-lock.json
 
 # dependencies
 node_modules/
@@ -24,8 +25,6 @@ pnpm-debug.log*
 # jetbrains setting folder
 .idea/
 .vscode/
-
-package-lock.json
 
 /src/generated/prisma
 .env
