@@ -1,6 +1,6 @@
 ---
 import Layout from '@/layouts/Base.astro';
-import OnboardForm from '@/components/Registration/OnboardingForm.astro';
+import OnboardForm from '@/components/Registration/OnboardingForm.tsx';
 import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 
 const { cookies, redirect } = Astro;
@@ -20,7 +20,6 @@ export const prerender = false;
 ---
 <Layout>
   <div class="pt-20 bg-gradient-to-br from-blue-100 to-blue-200">
-    <main class=""/>
-    <OnboardForm />
+    <OnboardForm client:load/>
   </div>
 </Layout>

@@ -4,9 +4,9 @@ export const prerender = false;
 import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 import Layout from '@/layouts/Dashboard.astro';
 import Navigation from '@/components/Dashboard/Navigation.astro';
-import RecentTransactions from '@/components/Dashboard/RecentTransactions.astro';
+import RecentTransactions from '@/components/Dashboard/RecentTransactions.tsx';
 import PieChart from '@/components/Dashboard/PieChart';
-import Header from '@/components/Dashboard/Accounts.astro';
+import Accounts from '@/components/Dashboard/Accounts.tsx';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -22,9 +22,9 @@ if (!onboarded) {
 ---
 
 <Layout>
-  <Header />
+  <Accounts client:load />
   <div class="pt-4 px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    <RecentTransactions title="Purchases"/>
+    <RecentTransactions client:load/>
     <PieChart client:load />
   </div>
 

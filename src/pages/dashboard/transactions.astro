@@ -3,8 +3,8 @@ export const prerender = false;
 import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 import Layout from '@/layouts/Dashboard.astro';
 import Navigation from '@/components/Dashboard/Navigation.astro';
-import Header from '@/components/Dashboard/Accounts.astro';
-import TransactionBoard from '@/components/Dashboard/Transactions/Transactions.astro';
+import Accounts from '@/components/Dashboard/Accounts.tsx';
+import { TransactionManager } from '@/components/Dashboard/Transactions/Transactions.tsx';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -21,8 +21,8 @@ if (!onboarded) {
 ---
 
 <Layout title="Purchases">
-  <Header />
-  <TransactionBoard />
+  <Accounts client:load />
+  <TransactionManager client:load/>
   <main class="pb-14" />
   <Navigation />
 </Layout>

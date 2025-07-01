@@ -1,8 +1,8 @@
 ---
 import Layout from '../../layouts/Base.astro';
-import RegistrationForm from '@/components/Registration/RegistrationForm.astro';
-export const prerender = true;
+import RegistrationForm from '@/components/Registration/RegistrationForm.tsx';
+export const prerender = false;
 ---
 <Layout>
-    <RegistrationForm type="login"/>
+    <RegistrationForm type="login" client:load/>
 </Layout>
