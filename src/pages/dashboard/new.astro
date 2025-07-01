@@ -3,7 +3,7 @@ export const prerender = false;
 import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 import Layout from '@/layouts/Dashboard.astro';
 import Navigation from '@/components/Dashboard/Navigation.astro';
-import AddEntryTabs from '@/components/Dashboard/New/NewEntry.astro';
+import AddEntryTabs from '@/components/Dashboard/New/NewEntry.tsx';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -27,7 +27,7 @@ if (!onboarded) {
           <p class="text-sm sm:text-base text-gray-600">Track your purchases, set goals, or record investments</p>
         </div>
 
-        <AddEntryTabs />
+        <AddEntryTabs client:load/>
       </div>
     </div>
     
