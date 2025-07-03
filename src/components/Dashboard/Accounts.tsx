@@ -60,7 +60,7 @@ export default function BalanceSection() {
   }
 
   return (
-    <section className="bg-gray-50 p-4 sm:p-6 md:p-8 pb-0 max-w-screen-xl mx-auto">
+    <section className="p-4 sm:p-6 md:p-8 md:pb-4 sm:pb-4 max-w-screen-xl mx-auto">
       <div className="flex justify-between items-center gap-2">
         <div className="leading-tight">
           <p className="text-gray-500 text-xs mb-0.5">Current Balance</p>

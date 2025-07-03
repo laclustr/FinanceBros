@@ -6,6 +6,7 @@ import "@/global.css"
 
 const {
 	title = "Dashboard",
+	ClassName = ''
 } = Astro.props;
 ---
 
@@ -20,7 +21,7 @@ const {
 		<meta name="generator" content={Astro.generator} />
 		<title>Finance Bros - {title}</title>
 	</head>
-	<body>
+	<body class={ClassName}>
 		<SpeedInsights/>
 		<Analytics/>
 		<slot />

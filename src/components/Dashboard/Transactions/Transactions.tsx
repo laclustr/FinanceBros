@@ -244,51 +244,60 @@ export function TransactionManager() {
     }
   };
   
-  // Reusable component for the filter controls form
   const FilterControls = () => (
-    <div className="grid grid-cols-1 gap-4 p-4 pb-0 pt-0">
-        <div className="space-y-2">
-            <Label htmlFor="type">Type</Label>
-            <Select value={filters.type} onValueChange={(value) => handleFilterChange("type", value)}>
-                <SelectTrigger id="type"><SelectValue placeholder="All Types" /></SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="purchase">Purchase</SelectItem>
-                    <SelectItem value="deposit">Deposit</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="maxAmount">Max Amount</Label>
-            <Input
-                id="maxAmount"
-                type="number"
-                placeholder="e.g., 500"
-                value={filters.maxAmount}
-                onChange={(e) => handleFilterChange("maxAmount", e.target.value)}
-            />
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Input
-                id="date"
-                type="date"
-                value={filters.date}
-                onChange={(e) => handleFilterChange("date", e.target.value)}
-            />
-        </div>
-        <div className="space-y-2">
-            <Label htmlFor="sortBy">Sort By</Label>
-            <Select value={filters.sortBy} onValueChange={(value) => handleFilterChange("sortBy", value)}>
-                <SelectTrigger id="sortBy"><SelectValue placeholder="Sort By" /></SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="date-desc">Date (Newest)</SelectItem>
-                    <SelectItem value="date-asc">Date (Oldest)</SelectItem>
-                    <SelectItem value="amount-desc">Amount (High-Low)</SelectItem>
-                    <SelectItem value="amount-asc">Amount (Low-High)</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
+    <div className="grid grid-cols-1 gap-4 pt-0 pb-0 lg:pt-4 lg:pb-4 px-4">
+      <div className="space-y-2">
+        <Label htmlFor="type">Type</Label>
+        <Select
+          value={filters.type}
+          onValueChange={(value) => handleFilterChange("type", value)}
+        >
+          <SelectTrigger id="type">
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="purchase">Purchase</SelectItem>
+            <SelectItem value="deposit">Deposit</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="maxAmount">Max Amount</Label>
+        <Input
+          id="maxAmount"
+          type="number"
+          placeholder="e.g., 500"
+          value={filters.maxAmount}
+          onChange={(e) => handleFilterChange("maxAmount", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="date">Date</Label>
+        <Input
+          id="date"
+          type="date"
+          value={filters.date}
+          onChange={(e) => handleFilterChange("date", e.target.value)}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="sortBy">Sort By</Label>
+        <Select
+          value={filters.sortBy}
+          onValueChange={(value) => handleFilterChange("sortBy", value)}
+        >
+          <SelectTrigger id="sortBy">
+            <SelectValue placeholder="Sort By" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="date-desc">Date (Newest)</SelectItem>
+            <SelectItem value="date-asc">Date (Oldest)</SelectItem>
+            <SelectItem value="amount-desc">Amount (High-Low)</SelectItem>
+            <SelectItem value="amount-asc">Amount (Low-High)</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 
@@ -305,7 +314,7 @@ export function TransactionManager() {
   );
 
   return (
-    <main className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+    <main className="shadow-lg border-0 rounded-lg bg-white/80 max-w-screen-xl mx-auto p-4 sm:p-6 md:p-8 space-y-6">
 
       {/* --- Filter Bar --- */}
       <div className="flex flex-col md:flex-row md:items-center gap-4">

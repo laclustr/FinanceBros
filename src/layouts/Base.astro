@@ -1,37 +1,39 @@
 ---
-import Analytics from '@vercel/analytics/astro'
-import SpeedInsights  from "@vercel/speed-insights/astro"
+const { ClassName = '' } = Astro.props;
+
+import Analytics from '@vercel/analytics/astro';
+import SpeedInsights from '@vercel/speed-insights/astro';
 
 import Navigation from "@/components/General/Navigation.astro"
 import "@/global.css"
 ---
 
 <!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="manifest" href="/manifest.webmanifest" />
-		<meta name="theme-color" content="#3367D6" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Finance Bros</title>
-	</head>
-	<body>
-		<script>
-			const redirectFromPaths = ['/'];
-			const excludedPaths = ['/login/sign-in', '/login/sign-up', '/dashboard'];
+<html lang="en" class={ClassName}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#3367D6" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Finance Bros</title>
+  </head>
+  <body class={ClassName}>
+    <script>
+      const redirectFromPaths = ['/'];
+      const excludedPaths = ['/login/sign-in', '/login/sign-up', '/dashboard'];
 
-			if (
-			(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) &&
-			redirectFromPaths.includes(window.location.pathname)
-			) {
-			window.location.replace('/dashboard');
-			}
-		</script>
-		<SpeedInsights/>
-		<Analytics/>
-		<Navigation />
-		<slot />
-	</body>
+      if (
+        (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) &&
+        redirectFromPaths.includes(window.location.pathname)
+      ) {
+        window.location.replace('/dashboard');
+      }
+    </script>
+    <SpeedInsights />
+    <Analytics />
+    <Navigation />
+    <slot />
+  </body>
 </html>
