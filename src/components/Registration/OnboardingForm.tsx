@@ -55,9 +55,7 @@ export default function OnboardingForm() {
     value: string
   ) => {
     setAccounts((accs) =>
-      accs.map((acc) =>
-        acc.id === id ? { ...acc, [field]: value } : acc
-      )
+      accs.map((acc) => (acc.id === id ? { ...acc, [field]: value } : acc))
     );
   };
 
@@ -122,14 +120,8 @@ export default function OnboardingForm() {
     e.preventDefault();
     setError("");
 
-    const {
-      firstName,
-      lastName,
-      age,
-      income,
-      employer,
-      creditScore,
-    } = formValues;
+    const { firstName, lastName, age, income, employer, creditScore } =
+      formValues;
 
     if (!firstName.trim() || !lastName.trim()) {
       setError("Please enter your full name");
@@ -191,7 +183,9 @@ export default function OnboardingForm() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "Something went wrong during onboarding.");
+        throw new Error(
+          data?.error || "Something went wrong during onboarding."
+        );
       }
       window.location.href = "/dashboard";
     } catch (err: any) {
@@ -200,7 +194,7 @@ export default function OnboardingForm() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen pt-5 p-4 bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen pt-5 p-4 bg-gradient-to-br from-blue-100 to-blue-200">
       <Card className="w-full max-w-2xl shadow-xl border border-gray-200">
         <CardHeader>
           <CardTitle className="text-center text-3xl font-semibold text-blue-900">
@@ -274,8 +268,7 @@ export default function OnboardingForm() {
 
             <div className="flex flex-col gap-1">
               <Label htmlFor="income">
-                Estimated Monthly Income{" "}
-                <span className="text-red-500">*</span>
+                Estimated Monthly Income <span className="text-red-500">*</span>
               </Label>
               <Select
                 onValueChange={(value) =>
