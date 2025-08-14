@@ -38,6 +38,8 @@ npm install
 ```
 DATABASE_URL=  // Should be in the format: "postgresql://[user[:password]@][netloc][:port][/dbname]?sslmode=require"
 JWT_SECRET=  // Random string of alphanumeric characters; the longer the better
+BREVO_API_KEY= // API key for Brevo
+POLYGON_API_KEY= // API key for Polygon
 ```
 - Finally, run this Command to Access the Website
 ```
