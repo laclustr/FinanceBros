@@ -152,20 +152,9 @@
   }
 }
 
-@layer utilities {
-  /* transition-colors but without outline-color transition property */
-  .starwind-transition-colors {
-    transition-property: color, background-color, border-color,
-      text-decoration-color, fill, stroke, --tw-gradient-from, --tw-gradient-via,
-      --tw-gradient-to;
-    transition-timing-function: var(--default-transition-timing-function);
-    transition-duration: var(--default-transition-duration);
-  }
-}
-
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(93% 0.034 272.788);
   --foreground: oklch(0.13 0.028 261.692);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.13 0.028 261.692);

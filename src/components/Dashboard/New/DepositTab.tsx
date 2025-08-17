@@ -9,6 +9,7 @@ export default function DepositTab() {
       apiEndpoint="/api/user/push/deposits"
       title="Add a Deposit"
       description="Fund your accounts and track income"
+      svgBackgroundColor="bg-blue-100"
       icon={
         <svg
           className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600"

@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 type Account = {
   id: number | string;
@@ -16,7 +22,10 @@ export default function BalanceSection() {
   const balanceRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
-    fetch("/api/user/fetch/accounts", { method: "POST", headers: { "Content-Type": "application/json" } })
+    fetch("/api/user/fetch/accounts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    })
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch accounts");
         return res.json();
@@ -44,15 +53,24 @@ export default function BalanceSection() {
     }
     setBalance(total);
     window.currentBalance = total;
-    window.dispatchEvent(new CustomEvent("accountChanged", { detail: { accountId } }));
+    window.dispatchEvent(
+      new CustomEvent("accountChanged", { detail: { accountId } })
+    );
 
     if (balanceRef.current) {
-      balanceRef.current.animate([{ transform: "scale(1.05)" }, { transform: "scale(1)" }], { duration: 200 });
+      balanceRef.current.animate(
+        [{ transform: "scale(1.05)" }, { transform: "scale(1)" }],
+        { duration: 200 }
+      );
     }
   }
 
   const formatCurrency = (amount: number) =>
-    amount.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 });
+    amount.toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+    });
 
   function onSelect(value: string) {
     setSelectedAccountId(value);
@@ -70,7 +88,7 @@ export default function BalanceSection() {
         </div>
 
         <Select value={selectedAccountId} onValueChange={onSelect}>
-          <SelectTrigger className="w-40 h-9 text-sm">
+          <SelectTrigger className="w-40 h-9 text-sm bg-white/80">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

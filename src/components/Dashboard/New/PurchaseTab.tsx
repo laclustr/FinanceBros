@@ -9,6 +9,7 @@ export default function PurchaseTab() {
       apiEndpoint="/api/user/push/purchases"
       title="Record a Purchase"
       description="Track your spending and expenses"
+      svgBackgroundColor="bg-red-100"
       icon={
         <svg
           className="w-6 h-6 sm:w-8 sm:h-8 text-red-600"

@@ -4,12 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { formatCurrency, parseCurrency } from "@/lib/utilities/currencyFormat";
 
 interface TransactionFormProps {
   formType: "purchase" | "deposit";
   apiEndpoint: string;
+  svgBackgroundColor: string;
   title: string;
   description: string;
   icon: React.ReactNode;
@@ -21,6 +28,7 @@ interface TransactionFormProps {
 export default function TransactionForm({
   formType,
   apiEndpoint,
+  svgBackgroundColor,
   title,
   description,
   icon,
@@ -130,15 +138,15 @@ export default function TransactionForm({
         onSubmit={handleSubmit}
       >
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full mb-4">
+          <div
+            className={`inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full mb-4 ${svgBackgroundColor}`}
+          >
             {icon}
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
             {title}
           </h2>
-          <p className="text-sm sm:text-base text-gray-600">
-            {description}
-          </p>
+          <p className="text-sm sm:text-base text-gray-600">{description}</p>
         </div>
 
         <div className="max-w-md mx-auto w-full mb-4 space-y-4">
@@ -156,12 +164,16 @@ export default function TransactionForm({
 
         <div className="flex-1 space-y-4 sm:space-y-6 max-w-md mx-auto w-full">
           <div className="space-y-2">
-            <Label htmlFor={`${formType}-title`}>{formType.charAt(0).toUpperCase() + formType.slice(1)} Title</Label>
+            <Label htmlFor={`${formType}-title`}>
+              {formType.charAt(0).toUpperCase() + formType.slice(1)} Title
+            </Label>
             <Input
               id={`${formType}-title`}
               name="title"
               type="text"
-              placeholder={`e.g., ${formType === "deposit" ? "Paycheck, Refund" : "Groceries, Gas"}`}
+              placeholder={`e.g., ${
+                formType === "deposit" ? "Paycheck, Refund" : "Groceries, Gas"
+              }`}
               required
               value={transactionTitle}
               onChange={(e) => setTransactionTitle(e.target.value)}
@@ -170,10 +182,7 @@ export default function TransactionForm({
 
           <div className="space-y-2">
             <Label htmlFor={`${formType}-account`}>Account</Label>
-            <Select
-              value={selectedAccount}
-              onValueChange={setSelectedAccount}
-            >
+            <Select value={selectedAccount} onValueChange={setSelectedAccount}>
               <SelectTrigger id={`${formType}-account`} className="w-full">
                 <SelectValue placeholder="Select an account" />
               </SelectTrigger>
