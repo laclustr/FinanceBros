@@ -1,17 +1,17 @@
-import { PrismaClient } from '@prisma/client';
-import { verifyToken } from '../../verify-token.ts';
+import { PrismaClient } from "@prisma/client";
+import { verifyToken } from "../../verify-token.ts";
 
 const prisma = new PrismaClient();
 
 export async function POST({ request, cookies }) {
   try {
-    const token = cookies.get('token')?.value;
+    const token = cookies.get("token")?.value;
     const user = await verifyToken(token);
 
     if (!user) {
       return new Response(
-        JSON.stringify({ error: 'Authentication required.' }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Authentication required." }),
+        { status: 401, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -19,8 +19,8 @@ export async function POST({ request, cookies }) {
 
     if (!id || !title || target === undefined || !deadline) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields.' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Missing required fields." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -30,17 +30,25 @@ export async function POST({ request, cookies }) {
 
     if (!goal || goal.userId !== user.id) {
       return new Response(
-        JSON.stringify({ error: 'Goal not found or unauthorized.' }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: "Goal not found or unauthorized." }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
       );
     }
+
+    const parts = deadline.split("-");
+    const normalizedDeadline = new Date(
+      Number(parts[0]),
+      Number(parts[1]) - 1,
+      Number(parts[2])
+    );
 
     const updateData: any = {
       title: title.trim(),
       target: Number(target),
-      deadline: new Date(deadline),
+      deadline: normalizedDeadline,
     };
-    if (typeof progress === 'number') {
+
+    if (typeof progress === "number") {
       updateData.progress = progress;
     }
 
@@ -50,15 +58,15 @@ export async function POST({ request, cookies }) {
     });
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Goal updated successfully.' }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ success: true, message: "Goal updated successfully." }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    console.error('Error editing goal:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    console.error("Error editing goal:", error);
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   } finally {
     await prisma.$disconnect();
   }

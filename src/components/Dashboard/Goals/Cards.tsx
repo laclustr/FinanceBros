@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Car,
   Home,
@@ -37,8 +37,15 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 
-// --- Types ---
-interface Goal {
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+
+type Goal = {
   id: number;
   userId: number;
   title: string;
@@ -46,15 +53,20 @@ interface Goal {
   target: number;
   progress: number;
   deadline: string;
-}
+};
 
-interface EditGoalState {
+type EditGoalState = {
   title: string;
   target: string;
   deadline: string;
-}
+};
 
-// --- Icons ---
+type Account = {
+  id: number | string;
+  name: string;
+  balance: number | string;
+};
+
 const iconMap = {
   car: Car,
   home: Home,
@@ -64,50 +76,68 @@ const iconMap = {
 
 export default function GoalCards() {
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
+
   const [isManageDialogOpen, setIsManageDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isCompleteConfirmOpen, setIsCompleteConfirmOpen] = useState(false);
 
   const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+
+  const [manageFromAccountId, setManageFromAccountId] = useState<string>("");
+  const [deleteReturnAccountId, setDeleteReturnAccountId] =
+    useState<string>("");
+
   const [editGoal, setEditGoal] = useState<EditGoalState>({
     title: "",
     target: "",
     deadline: "",
   });
+
   const [fundAmount, setFundAmount] = useState("");
 
-  // --- Fetch goals ---
+  const [isLoading, setIsLoading] = useState(false);
+  const [statusMsg, setStatusMsg] = useState<{
+    type: "error" | "success";
+    msg: string;
+  } | null>(null);
+
   useEffect(() => {
-    const fetchGoals = async () => {
+    (async () => {
       try {
-        const res = await fetch("/api/user/fetch/goals", {
-          method: "POST",
-          credentials: "include",
-        });
+        const [goalsRes, acctsRes] = await Promise.all([
+          fetch("/api/user/fetch/goals", {
+            method: "POST",
+            credentials: "include",
+          }),
+          fetch("/api/user/fetch/accounts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }),
+        ]);
 
-        if (res.redirected) {
-          window.location.href = res.url;
-          return;
-        }
+        if (!goalsRes.ok) throw new Error("Failed to fetch goals");
+        if (!acctsRes.ok) throw new Error("Failed to fetch accounts");
 
-        if (!res.ok) throw new Error("Failed to fetch goals");
+        const [goalsData, acctsData] = await Promise.all([
+          goalsRes.json(),
+          acctsRes.json(),
+        ]);
 
-        const data = await res.json();
-        setGoals(data);
-      } catch (error) {
-        console.error("Error fetching goals:", error);
+        setGoals(goalsData);
+        setAccounts(acctsData);
+      } catch (e: any) {
+        setStatusMsg({ type: "error", msg: e?.message || "Load failed." });
       }
-    };
-
-    fetchGoals();
+    })();
   }, []);
 
-  // --- Helpers ---
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
+      minimumFractionDigits: 2,
     }).format(amount);
 
   const formatDate = (dateString: string) =>
@@ -119,11 +149,13 @@ export default function GoalCards() {
 
   const formatDateForInput = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
+    const off = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - off * 60 * 1000);
+    return local.toISOString().split("T")[0];
   };
 
   const calculateProgress = (progress: number, target: number) =>
-    Math.min((progress / target) * 100, 100);
+    target > 0 ? Math.min((progress / target) * 100, 100) : 0;
 
   const getDaysRemaining = (targetDate: string) => {
     const today = new Date();
@@ -132,122 +164,203 @@ export default function GoalCards() {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  // --- Handlers ---
+  const selectedGoal = useMemo(
+    () => goals.find((g) => g.id === selectedGoalId) || null,
+    [goals, selectedGoalId]
+  );
+
   const handleEditGoalSubmit = async () => {
     if (!selectedGoalId) return;
+    setIsLoading(true);
+    setStatusMsg(null);
 
-    setGoals(
-      goals.map((g) =>
-        g.id === selectedGoalId
-          ? {
-              ...g,
-              title: editGoal.title,
-              target: Number(editGoal.target),
-              deadline: editGoal.deadline,
-            }
-          : g
-      )
-    );
+    try {
+      const res = await fetch("/api/user/edit/goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedGoalId,
+          title: editGoal.title.trim(),
+          target: Number(editGoal.target),
+          deadline: editGoal.deadline,
+        }),
+      });
 
-    await fetch("/api/user/edit/goal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: selectedGoalId,
-        title: editGoal.title,
-        target: Number(editGoal.target),
-        deadline: editGoal.deadline,
-      }),
-    });
+      if (!res.ok) {
+        const err = await safeJson(res);
+        throw new Error(err?.error || "Failed to update goal");
+      }
 
-    setIsEditDialogOpen(false);
+      setGoals((prev) =>
+        prev.map((g) =>
+          g.id === selectedGoalId
+            ? {
+                ...g,
+                title: editGoal.title.trim(),
+                target: Number(editGoal.target),
+                deadline: editGoal.deadline,
+              }
+            : g
+        )
+      );
+      setIsEditDialogOpen(false);
+      setStatusMsg({ type: "success", msg: "Goal updated." });
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Update failed." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteGoal = async () => {
-    if (!selectedGoalId) return;
+    if (!selectedGoalId || !deleteReturnAccountId) return;
 
-    await fetch("/api/user/delete/goal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        returnMoney: true,
-        id: selectedGoalId,
-      }),
-    });
+    setIsLoading(true);
+    setStatusMsg(null);
 
-    setGoals(goals.filter((g) => g.id !== selectedGoalId));
-    setIsDeleteConfirmOpen(false);
-  };
+    try {
+      const res = await fetch("/api/user/delete/goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedGoalId,
+          returnMoney: true,
+          returnAccountId: Number(deleteReturnAccountId),
+        }),
+      });
 
-  const handleManageFunds = async () => {
-    if (!selectedGoalId || !fundAmount) return;
+      if (!res.ok) {
+        const err = await safeJson(res);
+        throw new Error(err?.error || "Failed to delete goal");
+      }
 
-    const numericFundAmount = Number(fundAmount);
+      setGoals((prev) => prev.filter((g) => g.id !== selectedGoalId));
+      setIsDeleteConfirmOpen(false);
+      setDeleteReturnAccountId("");
+      setStatusMsg({
+        type: "success",
+        msg: "Goal deleted and funds returned.",
+      });
 
-    await fetch("/api/user/edit/goal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: selectedGoalId,
-        progress:
-          goals.find((g) => g.id === selectedGoalId)!.progress +
-          numericFundAmount,
-      }),
-    });
-
-    setGoals(
-      goals.map((g) =>
-        g.id === selectedGoalId
-          ? { ...g, progress: g.progress + numericFundAmount }
-          : g
-      )
-    );
-
-    setIsManageDialogOpen(false);
-    setFundAmount("");
+      window.dispatchEvent(new CustomEvent("accountsRefresh"));
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Delete failed." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleMarkComplete = async () => {
     if (!selectedGoalId) return;
 
-    const goalToComplete = goals.find((g) => g.id === selectedGoalId);
-    if (!goalToComplete) return;
+    setIsLoading(true);
+    setStatusMsg(null);
 
-    setGoals(
-      goals.map((g) =>
-        g.id === selectedGoalId ? { ...g, progress: g.target } : g
-      )
-    );
+    try {
+      const res = await fetch("/api/user/delete/goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedGoalId,
+          returnMoney: false,
+          returnAccountId: null,
+        }),
+      });
 
-    await fetch("/api/user/delete/goal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        returnMoney: false,
-        id: selectedGoalId,
-        progress: goalToComplete.target,
-      }),
-    });
+      if (!res.ok) {
+        const err = await safeJson(res);
+        throw new Error(err?.error || "Failed to mark complete");
+      }
 
-    setIsCompleteConfirmOpen(false);
+      setGoals((prev) => prev.filter((g) => g.id !== selectedGoalId));
+      setIsCompleteConfirmOpen(false);
+      setStatusMsg({ type: "success", msg: "Goal marked complete." });
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Complete failed." });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const EmptyState = () => (
-    <div className="text-center py-16 text-gray-500">
-      <FolderSearch className="mx-auto h-12 w-12 text-gray-400" />
-      <h3 className="mt-2 text-sm font-medium text-gray-900">No Goals Found</h3>
-    </div>
-  );
+  const handleManageFunds = async () => {
+    if (!selectedGoalId || !fundAmount || !manageFromAccountId) return;
 
-  // --- Render ---
+    const numericFundAmount = Number(fundAmount);
+    if (!Number.isFinite(numericFundAmount) || numericFundAmount <= 0) {
+      setStatusMsg({ type: "error", msg: "Enter a positive amount." });
+      return;
+    }
+
+    setIsLoading(true);
+    setStatusMsg(null);
+
+    try {
+      const res = await fetch("/api/user/increment/goal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: selectedGoalId,
+          amount: numericFundAmount,
+          fromAccountId: Number(manageFromAccountId),
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await safeJson(res);
+        throw new Error(err?.error || "Failed to add funds");
+      }
+
+      const data = await res.json();
+
+      setGoals((prev) =>
+        prev.map((g) =>
+          g.id === selectedGoalId ? { ...g, progress: data.newProgress } : g
+        )
+      );
+
+      setIsManageDialogOpen(false);
+      setFundAmount("");
+      setManageFromAccountId("");
+      setStatusMsg({ type: "success", msg: "Funds added to goal." });
+
+      window.dispatchEvent(new CustomEvent("accountsRefresh"));
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Add funds failed." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  async function safeJson(res: Response) {
+    try {
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
+
   return (
-    <section
-      id="goal-section"
-      className="min-h-screen max-w-screen-xl mx-auto p-3 sm:p-6 md:p-8 pt-0 transition-all duration-300"
-    >
+    <section className="min-h-screen max-w-screen-xl mx-auto p-3 sm:p-6 md:p-8 pt-0">
+      {statusMsg && (
+        <div
+          className={`p-2 mb-4 rounded border ${
+            statusMsg.type === "error"
+              ? "bg-red-100 text-red-700 border-red-300"
+              : "bg-green-100 text-green-700 border-green-300"
+          }`}
+        >
+          {statusMsg.msg}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {goals.length === 0 ? (
-          <EmptyState />
+          <div className="text-center py-16 text-gray-500">
+            <FolderSearch className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No Goals Found
+            </h3>
+          </div>
         ) : (
           goals.map((goal) => {
             const IconComponent =
@@ -274,11 +387,15 @@ export default function GoalCards() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isLoading}
+                        >
                           <MoreVertical className="h-5 w-5" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent>
+                      <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedGoalId(goal.id);
@@ -303,6 +420,7 @@ export default function GoalCards() {
                         <DropdownMenuItem
                           onClick={() => {
                             setSelectedGoalId(goal.id);
+                            setDeleteReturnAccountId("");
                             setIsDeleteConfirmOpen(true);
                           }}
                         >
@@ -363,8 +481,11 @@ export default function GoalCards() {
                     className="w-full bg-black"
                     onClick={() => {
                       setSelectedGoalId(goal.id);
+                      setManageFromAccountId("");
+                      setFundAmount("");
                       setIsManageDialogOpen(true);
                     }}
+                    disabled={isLoading}
                   >
                     Manage Funds
                   </Button>
@@ -381,29 +502,63 @@ export default function GoalCards() {
           <DialogHeader>
             <DialogTitle>Manage Funds</DialogTitle>
             <DialogDescription>
-              Enter an amount to add to your goal&apos;s progress.
+              Pull from an account and add to the goal.
             </DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-2">
-            <Label htmlFor="fund-amount">Amount</Label>
-            <Input
-              id="fund-amount"
-              type="number"
-              placeholder="$50.00"
-              value={fundAmount}
-              onChange={(e) => setFundAmount(e.target.value)}
-            />
+            <div className="space-y-2">
+              <Label htmlFor="mf-amount">Amount</Label>
+              <Input
+                id="mf-amount"
+                type="number"
+                placeholder="50.00"
+                value={fundAmount}
+                onChange={(e) => setFundAmount(e.target.value)}
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>From Account</Label>
+              <Select
+                value={manageFromAccountId}
+                onValueChange={setManageFromAccountId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((acc) => (
+                    <SelectItem key={acc.id} value={String(acc.id)}>
+                      {acc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
+
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsManageDialogOpen(false)}
               className="bg-white"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button onClick={handleManageFunds} className="bg-black">
-              Submit
+            <Button
+              onClick={handleManageFunds}
+              className="bg-black"
+              disabled={
+                isLoading ||
+                !fundAmount ||
+                !manageFromAccountId ||
+                !selectedGoal
+              }
+            >
+              {isLoading ? "Adding..." : "Add Funds"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -414,79 +569,121 @@ export default function GoalCards() {
         <DialogContent className="bg-white">
           <DialogHeader>
             <DialogTitle>Edit Goal</DialogTitle>
-            <DialogDescription>
-              Update your goal&apos;s details below.
-            </DialogDescription>
+            <DialogDescription>Update goal details.</DialogDescription>
           </DialogHeader>
+
           <div className="space-y-4 py-2">
-            <Label htmlFor="edit-title">Title</Label>
-            <Input
-              id="edit-title"
-              value={editGoal.title}
-              onChange={(e) =>
-                setEditGoal({ ...editGoal, title: e.target.value })
-              }
-            />
-            <Label htmlFor="edit-target">Target</Label>
-            <Input
-              id="edit-target"
-              type="number"
-              value={editGoal.target}
-              onChange={(e) =>
-                setEditGoal({ ...editGoal, target: e.target.value })
-              }
-            />
-            <Label htmlFor="edit-deadline">Target Date</Label>
-            <Input
-              id="edit-deadline"
-              type="date"
-              value={editGoal.deadline}
-              onChange={(e) =>
-                setEditGoal({ ...editGoal, deadline: e.target.value })
-              }
-            />
+            <div className="space-y-2">
+              <Label htmlFor="edit-title">Title</Label>
+              <Input
+                id="edit-title"
+                value={editGoal.title}
+                onChange={(e) =>
+                  setEditGoal((s) => ({ ...s, title: e.target.value }))
+                }
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-target">Target</Label>
+              <Input
+                id="edit-target"
+                type="number"
+                value={editGoal.target}
+                onChange={(e) =>
+                  setEditGoal((s) => ({ ...s, target: e.target.value }))
+                }
+                disabled={isLoading}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-deadline">Target Date</Label>
+              <Input
+                id="edit-deadline"
+                type="date"
+                value={editGoal.deadline}
+                onChange={(e) =>
+                  setEditGoal((s) => ({ ...s, deadline: e.target.value }))
+                }
+                disabled={isLoading}
+              />
+            </div>
           </div>
+
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsEditDialogOpen(false)}
               className="bg-white"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button onClick={handleEditGoalSubmit} className="bg-black">
-              Save Changes
+            <Button
+              onClick={handleEditGoalSubmit}
+              className="bg-black"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      {/* Delete (choose return account) */}
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <DialogContent className="bg-white">
           <DialogHeader>
-            <DialogTitle>Are you sure?</DialogTitle>
+            <DialogTitle>Delete Goal</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. This will permanently delete your
-              goal.
+              Select an account to return the goal’s current funds to.
             </DialogDescription>
           </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Return To Account</Label>
+              <Select
+                value={deleteReturnAccountId}
+                onValueChange={setDeleteReturnAccountId}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select account" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts.map((acc) => (
+                    <SelectItem key={acc.id} value={String(acc.id)}>
+                      {acc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsDeleteConfirmOpen(false)}
               className="bg-white"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDeleteGoal}>
-              Yes, Delete
+            <Button
+              variant="destructive"
+              onClick={handleDeleteGoal}
+              disabled={isLoading || !deleteReturnAccountId}
+            >
+              {isLoading ? "Deleting..." : "Delete Goal"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Mark Complete Confirmation */}
+      {/* Mark Complete (no funds returned) */}
       <Dialog
         open={isCompleteConfirmOpen}
         onOpenChange={setIsCompleteConfirmOpen}
@@ -495,20 +692,25 @@ export default function GoalCards() {
           <DialogHeader>
             <DialogTitle>Mark Goal as Complete?</DialogTitle>
             <DialogDescription>
-              This will set your current progress equal to your target amount,
-              marking the goal as 100% complete. Are you sure?
+              This removes the goal without returning its funds to an account.
             </DialogDescription>
           </DialogHeader>
+
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => setIsCompleteConfirmOpen(false)}
               className="bg-white"
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button onClick={handleMarkComplete} className="bg-black">
-              Yes, Mark as Complete
+            <Button
+              onClick={handleMarkComplete}
+              className="bg-black"
+              disabled={isLoading}
+            >
+              {isLoading ? "Completing..." : "Yes, Mark as Complete"}
             </Button>
           </DialogFooter>
         </DialogContent>
