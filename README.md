@@ -7,10 +7,11 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 
 ### Key Features
 - Real-time budget tracking
-- intuitive dashboards
-- Interactive visualizations for spending insights
+- ~~intuitive dashboards~~
+- ~~Interactive visualizations for spending insights~~
 - Fully responsive UI with dark mode support
-- Personalized alerts for overspending or upcoming payments
+- Financial goal tracking
+- Intuitive UI
 
 ## Checklist
 - [x] User authentication and account creation  
