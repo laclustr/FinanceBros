@@ -14,10 +14,10 @@ Created as a submission to the RRHS Congressional App Challenge, the app blends 
 
 ## Checklist
 - [x] User authentication and account creation  
-- [ ] Dashboard for tracking expenses and income  
-- [ ] Interactive charts and graphs (e.g., pie chart, bar graph)  
-- [x] Responsive mobile and desktop design  
-- [x] Local storage and/or backend data persistence  
+- [ ] ~~Dashboard for tracking expenses and income~~ 
+- [ ] ~~Interactive charts and graphs (e.g., pie chart, bar graph)~~
+- [x] Responsive mobile and desktop design
+- [x] Backend data persistence  
 - [x] Monthly budget planning and tracking tools  
 - [x] Categorization of transactions  
 - [x] Clean UI/UX design with accessibility in mind   
@@ -41,7 +41,7 @@ JWT_SECRET=  // Random string of alphanumeric characters; the longer the better
 BREVO_API_KEY= // API key for Brevo
 POLYGON_API_KEY= // API key for Polygon
 ```
-- Finally, run this Command to Access the Website
+- Finally, run this command to access the website
 ```
 npm run dev
 ```
