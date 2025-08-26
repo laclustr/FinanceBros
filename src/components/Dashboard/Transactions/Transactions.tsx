@@ -722,7 +722,7 @@ function EditTransactionDialog({
       ...transaction,
       ...formData,
       amount: numericAmount,
-      date: new Date(formData.date).toISOString(), // Ensure date is in ISO format
+      date: new Date(formData.date).toISOString(),
     });
   };
 

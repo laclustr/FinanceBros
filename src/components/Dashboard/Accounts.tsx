@@ -1,106 +1,306 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 type Account = {
   id: number | string;
   name: string;
-  balance: number | string;
+  balance: number;
 };
 
-export default function BalanceSection() {
+export default function AccountManagement() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [selectedAccountId, setSelectedAccountId] = useState<string>("all");
-  const [balance, setBalance] = useState(0);
-  const balanceRef = useRef<HTMLParagraphElement>(null);
+  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
+  const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
+  const [selectedDeleteId, setSelectedDeleteId] = useState<string>("");
 
+  const [newAccountName, setNewAccountName] = useState("");
+  const [newAccountBalance, setNewAccountBalance] = useState("");
+
+  const [statusMsg, setStatusMsg] = useState<{
+    type: "error" | "success";
+    msg: string;
+  } | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch user accounts
   useEffect(() => {
-    fetch("/api/user/fetch/accounts", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then((res) => {
+    (async () => {
+      try {
+        const res = await fetch("/api/user/fetch/accounts", {
+          method: "POST",
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to fetch accounts");
-        return res.json();
-      })
-      .then((data: Account[]) => {
-        setAccounts(data);
-        setSelectedAccountId("all");
-        updateBalance("all", data);
-      })
-      .catch(() => {
-        if (balanceRef.current) {
-          balanceRef.current.textContent = "Error loading balance";
-          balanceRef.current.className = "font-bold text-2xl text-red-600";
-        }
-      });
+        setAccounts(await res.json());
+      } catch (e: any) {
+        setStatusMsg({ type: "error", msg: e?.message || "Failed to load" });
+      }
+    })();
   }, []);
 
-  function updateBalance(accountId: string, accts = accounts) {
-    let total = 0;
-    if (accountId === "all") {
-      total = accts.reduce((sum, a) => sum + Number(a.balance || 0), 0);
-    } else {
-      const acc = accts.find((a) => String(a.id) === accountId);
-      total = acc ? Number(acc.balance || 0) : 0;
-    }
-    setBalance(total);
-    window.currentBalance = total;
-    window.dispatchEvent(
-      new CustomEvent("accountChanged", { detail: { accountId } })
-    );
+  const handleAddAccount = async () => {
+    if (!newAccountName || !newAccountBalance) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/account/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newAccountName,
+          balance: Number(newAccountBalance),
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add account");
 
-    if (balanceRef.current) {
-      balanceRef.current.animate(
-        [{ transform: "scale(1.05)" }, { transform: "scale(1)" }],
-        { duration: 200 }
+      const account = await res.json();
+      setAccounts((prev) => [...prev, account]);
+      setIsAddAccountOpen(false);
+      setNewAccountName("");
+      setNewAccountBalance("");
+      setStatusMsg({ type: "success", msg: "Account added!" });
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Add failed" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // delete BANK account
+  const handleDeleteBankAccount = async () => {
+    if (!selectedDeleteId) return;
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/user/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: Number(selectedDeleteId) }),
+      });
+      if (!res.ok) throw new Error("Failed to delete account");
+
+      setAccounts((prev) =>
+        prev.filter((a) => String(a.id) !== selectedDeleteId)
       );
+      setIsDeleteAccountOpen(false);
+      setSelectedDeleteId("");
+      setStatusMsg({ type: "success", msg: "Bank account deleted." });
+    } catch (e: any) {
+      setStatusMsg({ type: "error", msg: e?.message || "Delete failed" });
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
-  const formatCurrency = (amount: number) =>
-    amount.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 2,
+  // send email verification
+  const handleSendVerification = async () => {
+    await fetch("/api/user/send-verification", { method: "POST" });
+    setStatusMsg({ type: "success", msg: "Verification email sent." });
+  };
+
+  const handleChangeEmail = async (newEmail: string) => {
+    await fetch("/api/user/change-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: newEmail }),
     });
+    setStatusMsg({ type: "success", msg: "Email updated." });
+  };
 
-  function onSelect(value: string) {
-    setSelectedAccountId(value);
-    updateBalance(value);
-  }
+  const handleChangePassword = async (newPassword: string) => {
+    await fetch("/api/user/change-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: newPassword }),
+    });
+    setStatusMsg({ type: "success", msg: "Password updated." });
+  };
+
+  const handleLogout = async () => {
+    await fetch("/api/user/logout", { method: "POST" });
+    window.location.href = "/login";
+  };
+
+  // delete USER account
+  const handleDeleteUserAccount = async () => {
+    await fetch("/api/user/delete-account", { method: "POST" });
+    window.location.href = "/goodbye";
+  };
 
   return (
-    <section className="p-4 sm:p-6 md:p-8 md:pb-4 sm:pb-4 max-w-screen-xl mx-auto">
-      <div className="flex justify-between items-center gap-2">
-        <div className="leading-tight">
-          <p className="text-gray-500 text-xs mb-0.5">Current Balance</p>
-          <p ref={balanceRef} className="font-bold text-2xl text-gray-800">
-            {formatCurrency(balance)}
-          </p>
+    <section className="max-w-2xl mx-auto p-6 space-y-6">
+      {statusMsg && (
+        <div
+          className={`p-2 mb-4 rounded border ${
+            statusMsg.type === "error"
+              ? "bg-red-100 text-red-700 border-red-300"
+              : "bg-green-100 text-green-700 border-green-300"
+          }`}
+        >
+          {statusMsg.msg}
         </div>
+      )}
 
-        <Select value={selectedAccountId} onValueChange={onSelect}>
-          <SelectTrigger className="w-40 h-9 text-sm bg-white/80">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Accounts</SelectItem>
-            {accounts.map((acc) => (
-              <SelectItem key={acc.id} value={String(acc.id)}>
-                {acc.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Bank Accounts */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Bank Accounts</CardTitle>
+          <CardDescription>Manage your linked accounts</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {accounts.length === 0 ? (
+            <p className="text-sm text-gray-500">No accounts yet</p>
+          ) : (
+            <ul className="space-y-2">
+              {accounts.map((a) => (
+                <li
+                  key={a.id}
+                  className="flex justify-between items-center border rounded p-2"
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{a.name}</span>
+                    <span className="text-sm text-gray-600">
+                      ${a.balance.toFixed(2)}
+                    </span>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedDeleteId(String(a.id));
+                      setIsDeleteAccountOpen(true);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+        <CardFooter>
+          <Button onClick={() => setIsAddAccountOpen(true)}>Add Account</Button>
+        </CardFooter>
+      </Card>
+
+      {/* Account Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Settings</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button onClick={handleSendVerification} className="w-full">
+            Send Email Verification
+          </Button>
+          <Button
+            onClick={() => handleChangeEmail(prompt("Enter new email") || "")}
+            className="w-full"
+          >
+            Change Email
+          </Button>
+          <Button
+            onClick={() =>
+              handleChangePassword(prompt("Enter new password") || "")
+            }
+            className="w-full"
+          >
+            Change Password
+          </Button>
+          <Button onClick={handleLogout} className="w-full">
+            Logout
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteUserAccount}
+            className="w-full"
+          >
+            Delete Account
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Add Account Dialog */}
+      <Dialog open={isAddAccountOpen} onOpenChange={setIsAddAccountOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Bank Account</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Account Name</Label>
+              <Input
+                value={newAccountName}
+                onChange={(e) => setNewAccountName(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label>Starting Balance</Label>
+              <Input
+                type="number"
+                value={newAccountBalance}
+                onChange={(e) => setNewAccountBalance(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsAddAccountOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleAddAccount} disabled={isLoading}>
+              {isLoading ? "Adding..." : "Add"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Bank Account Dialog */}
+      <Dialog open={isDeleteAccountOpen} onOpenChange={setIsDeleteAccountOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Bank Account</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this bank account?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteAccountOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteBankAccount}
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

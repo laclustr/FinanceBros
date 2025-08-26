@@ -3,6 +3,7 @@ export const prerender = false;
 import { hasOnboarded } from '@/lib/auth/OnboardStatus';
 import Layout from '@/layouts/Dashboard.astro';
 import Navigation from '@/components/Dashboard/Navigation.astro';
+import ManageAccount from '@/components/Dashboard/Account/ManageAccount';
 
 const { cookies, redirect } = Astro;
 const token = cookies.get('token')?.value;
@@ -18,8 +19,6 @@ if (!onboarded) {
 ---
 
 <Layout title="Account">
-  <form action="/api/logout" method="POST">
-    <button type="submit">Logout</button>
-  </form>
+  <ManageAccount client:load />
   <Navigation />
 </Layout>

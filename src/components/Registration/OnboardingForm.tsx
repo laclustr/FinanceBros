@@ -187,7 +187,7 @@ export default function OnboardingForm() {
           data?.error || "Something went wrong during onboarding."
         );
       }
-      window.location.href = "/dashboard";
+      window.location.href = "/dashboard/transactions";
     } catch (err: any) {
       setError(err.message || "Unknown error");
     }
